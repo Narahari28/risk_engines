@@ -2,10 +2,7 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src/src"/>
-	<classpathentry kind="src" path="src/src_android"/>
-	<classpathentry kind="src" path="src/src_lobbyserver"/>
 	<classpathentry kind="src" path="src/src_mapstore"/>
-	<classpathentry kind="src" path="src/src_swing"/>
 	<classpathentry kind="lib" path="Domination.jar"/>
 	<classpathentry kind="lib" path="lib/Grasshopper.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.1.2.jar"/>
