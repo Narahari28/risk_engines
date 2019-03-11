@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src/src"/>
+	<classpathentry excluding="src/src/|src/src_lobbyserver/|src/res_swing/|src/src_android/|src/src_swing/|src/src_mapstore/" kind="src" path=""/>
+	<classpathentry kind="src" path="src/src_lobbyserver"/>
+	<classpathentry kind="src" path="src/res_swing"/>
+	<classpathentry kind="src" path="src/src_android"/>
+	<classpathentry kind="src" path="src/src_swing"/>
+	<classpathentry kind="src" path="src/src_mapstore"/>
+	<classpathentry kind="lib" path="Domination.jar"/>
+	<classpathentry kind="lib" path="lib/Grasshopper.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpmime-4.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/LobbyCore.jar"/>
+	<classpathentry kind="lib" path="lib/m3gbasic.jar"/>
+	<classpathentry kind="lib" path="lib/midletrunner.jar"/>
+	<classpathentry kind="lib" path="lib/SwingME.jar"/>
+	<classpathentry kind="lib" path="lib/TranslationTool.jar"/>
+	<classpathentry kind="lib" path="Uninstaller/uninstaller.jar"/>
+	<classpathentry kind="lib" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home/jre/lib/javaws.jar"/>
+	<classpathentry kind="lib" path="/Users/naraharibharadwaj/Downloads/jfreechart-1.0.19/lib/jcommon-1.0.23.jar"/>
+	<classpathentry kind="lib" path="/Users/naraharibharadwaj/Downloads/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

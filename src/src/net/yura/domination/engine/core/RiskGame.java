@@ -3,6 +3,9 @@
 package net.yura.domination.engine.core;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -185,6 +188,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 		cardState=0;
 
 		replayCommands = new Vector();
+		printNewGameNewLine("game_state.txt");
 
 		//System.out.print("New Game created\n"); // testing
 
@@ -1463,6 +1467,12 @@ transient - A keyword in the Java programming language that indicates that a fie
 
 		if (result==true) {
 			gameState=STATE_GAME_OVER;
+			try {
+				printGameWonBy(this.currentPlayer, "game_state.txt");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		return result;
@@ -2207,7 +2217,90 @@ transient - A keyword in the Java programming language that indicates that a fie
 		RiskGame game = null;
 		return game;
 	}
+	 * @throws IOException 
          */
+	
+	public void printNewGameNewLine(String fileName) throws IOException {
+		File file = new File(fileName);
+		FileWriter fr = new FileWriter(file, true);
+		BufferedWriter br = new BufferedWriter(fr);
+		br.write("New Game");
+		br.newLine();
+		br.close();
+		fr.close();
+	}
+	
+	public void printGameWonBy(Player player, String fileName) throws IOException {
+		File file = new File(fileName);
+		FileWriter fr = new FileWriter(file, true);
+		BufferedWriter br = new BufferedWriter(fr);
+		br.write("Game won by " + player.getName());
+		br.newLine();
+		br.write("-----------------------------");
+		br.newLine();
+		br.close();
+		fr.close();
+	}
+	
+	public void printOutput(String output, String fileName) throws IOException {
+		File file = new File(fileName);
+		FileWriter fr = new FileWriter(file, true);
+		BufferedWriter br = new BufferedWriter(fr);
+		br.write("Output: " + output);
+		br.newLine();
+		br.write("-----------------------------");
+		br.newLine();
+		br.close();
+		fr.close();
+	}
+	
+	
+	public void printGameState(String fileName) throws IOException {
+		File file = new File(fileName);
+		FileWriter fr = new FileWriter(file, true);
+		BufferedWriter br = new BufferedWriter(fr);
+		br.write("Players: " + this.Players.toString());
+		br.newLine();
+		br.write("Current player: " + this.currentPlayer.getName());
+		br.newLine();
+		br.write("Game state: " + this.gameState);
+		br.newLine();
+		br.write("Must move: " + this.mustmove);
+		br.newLine();
+		br.write("Captured country?: " + this.capturedCountry);
+		br.newLine();
+		if(this.attacker != null) {
+			br.write("Attacker: " + this.attacker.getName());
+			br.newLine();
+			br.write("Attacker dice: " + this.attackerDice);
+			br.newLine();
+		}
+		if(this.defender != null) {
+			br.write("Defender: " + this.defender.getName());
+			br.newLine();
+			br.write("Defender: " + this.defenderDice);
+			br.newLine();
+		}
+		br.write("Cards: " + this.Cards);
+		br.newLine();
+		br.write("Used cards: " + this.usedCards);
+		br.newLine();
+		br.write(((Player) this.Players.get(0)).getName() + " cards: " + ((Player) this.Players.get(0)).getCards());
+		br.newLine();
+		br.write(((Player) this.Players.get(1)).getName() + " cards: " + ((Player) this.Players.get(1)).getCards());
+		br.newLine();
+		br.write("Countries: ");
+		br.newLine();
+		for(int i = 0; i < this.Countries.length; i++) {
+			Country c = this.Countries[i];
+			br.write(c.getName() + " " + c.getOwner() + " " + c.getArmies());
+			br.newLine();
+		}
+		br.write("-----------------------------");
+		br.newLine();
+		br.close();
+		fr.close();
+	}
 
 	/**
 	 * Saves the current game to a file

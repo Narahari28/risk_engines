@@ -1,5 +1,6 @@
 package net.yura.domination.engine.ai;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,13 +42,19 @@ public class AIManager {
 
     public void play(Risk risk) {
             RiskGame game = risk.getGame();
-            String output = getOutput(game, game.getCurrentPlayer().getType() );
+            String output = "";
+			try {
+				output = getOutput(game, game.getCurrentPlayer().getType() );
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
             try { Thread.sleep(wait); }
             catch(InterruptedException e) {}
             risk.parser(output);
     }
 
-    public String getOutput(RiskGame game,int type) {
+    public String getOutput(RiskGame game,int type) throws IOException {
 
             AI usethisAI=ais.get(type);
 
@@ -56,6 +63,7 @@ public class AIManager {
             }
 
             usethisAI.setGame(game);
+            game.printGameState("game_state.txt");
 
             String output=null;
 
@@ -75,7 +83,7 @@ public class AIManager {
             }
 
             if (output==null) { throw new NullPointerException("AI ERROR!"); }
-
+            game.printOutput(output, "game_state.txt");
             return output;
     }
 
