@@ -118,14 +118,21 @@ public class CommandText extends Thread {
 	 * loops through when Input is needed
 	 */
 	public void run() {
-
+		String[] commands = {"newgame", "newplayer ai easy black Easy", "newplayer ai hard blue Hard", "startgame domination increasing", "closegame"};
+		int totalIterations = 300*commands.length;
+		int currentIterations = 0;
 		while(true) {
+			if(currentIterations >= totalIterations) {
+				break;
+			}
 
 			String input="";
 			System.out.print(">");
 
 			try {
-				input = br.readLine();
+//				input = br.readLine(); // Old code to read inputs
+				input = commands[currentIterations % commands.length];
+				currentIterations++;
 				if (input.equals("help")) {
 					Help();
 					continue;
