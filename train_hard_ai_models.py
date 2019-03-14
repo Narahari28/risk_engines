@@ -30,7 +30,7 @@ def read_attacks():
 
 def load_data():
   lines = []
-  f = open("game_state.txt", "r")
+  f = open("easy_vs_hard.txt", "r")
   line = f.readline().strip()
 
   currentlyTracking = False
