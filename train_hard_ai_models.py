@@ -210,4 +210,4 @@ if __name__ == "__main__":
   # fit_model_and_test_state_4()
   # fit_model_and_test_state_5()
   # fit_model_and_test_state_6()
-  # fit_model_and_test_state_10()
+  fit_model_and_test_state_10()
