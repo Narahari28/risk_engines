@@ -272,7 +272,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 	 * @param mode This represents the moce of the game: normal, 2 player, capital or mission
 	 */
 	public void startGame(int mode, int card, boolean recycle, boolean threeDice) throws Exception {
-
+		
 		if (gameState==STATE_NEW_GAME) { //  && ((mapfile !=null && cardsfile !=null) || () )
 
 			gameMode=mode;
@@ -359,6 +359,8 @@ transient - A keyword in the Java programming language that indicates that a fie
 			capturedCountry=false;
 			tradeCap=false;
 
+
+			printAllPossibleAttacks("attacks.txt");
 		}
 
 	}
@@ -369,7 +371,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 	public void testMap() throws Exception {
 
 		//System.out.print("Starting map test...\n");
-
+		
 		for (int c=0; c< Countries.length ; c++) {
 
 			Country c1 = Countries[c];
@@ -2219,6 +2221,23 @@ transient - A keyword in the Java programming language that indicates that a fie
 	}
 	 * @throws IOException 
          */
+	
+	public void printAllPossibleAttacks(String fileName) throws IOException {
+		File file = new File(fileName);
+		FileWriter fr = new FileWriter(file, false);
+		BufferedWriter br = new BufferedWriter(fr);
+		for (int i = 0; i < this.Countries.length; i++) {
+			Country c = this.Countries[i];
+			Vector<Country> neighbors = c.getNeighbours();
+			for(int j = 0; j < neighbors.size(); j++) {
+				Country neighbor = neighbors.get(j);
+				br.write(c.getColor() + " " + neighbor.getColor());
+				br.newLine();
+			}
+		}
+		br.close();
+		fr.close();
+	}
 	
 	public void printNewGameNewLine(String fileName) throws IOException {
 		File file = new File(fileName);

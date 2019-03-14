@@ -16,6 +16,15 @@ y_state_4 = []
 y_state_5 = []
 y_state_6 = []
 y_state_10 = []
+all_attacks = []
+
+def read_attacks():
+  f = open("attacks.txt", "r")
+  line = f.readline().strip()
+  all_attacks.append("endattack")
+  while line:
+    all_attacks.append(line)
+    line = f.readline().strip()
 
 def load_data():
   lines = []
@@ -48,10 +57,16 @@ def load_data():
           pass
         elif gameState == 2:
           x_state_2.append(countries)
-          observed_class = int(line.split()[-2])
+          observed_class = int(line.split()[-2]) # e.g. 39
           y_state_2.append(observed_class)
         elif gameState == 3:
-          pass
+          x_state_3.append(countries)
+          if "endattack" in line:
+            attack_phrase = "endattack"
+          else:
+            attack_phrase = " ".join(line.split()[-2:]) # Format "2 3"
+          observed_class = all_attacks.index(attack_phrase)
+          y_state_3.append(observed_class)
         elif gameState == 4:
           pass
         elif gameState == 5:
@@ -102,10 +117,27 @@ def fit_model_and_test_state_2():
         max_prob = val
         ans = j + 1
     y_pred.append(ans)
-  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~28%, much better than 1/42
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~28%, much better than 1/21 (own 21 countries on average)
 
 def fit_model_and_test_state_3():
-  pass
+  x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
+  model = GaussianNB()
+  model.fit(x_train, y_train)
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      attackPhrase = all_attacks[j]
+      isValidAttack = attackPhrase == "endattack" or ((x_test[i][int(attackPhrase.split()[0]) - 1] >= 0) and (x_test[i][int(attackPhrase.split()[1]) - 1] <= 0))
+      if(val >= max_prob and isValidAttack):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~29.5%, much better than 1/20 (20 valid attacks on average)
 
 def fit_model_and_test_state_4():
   pass
@@ -120,10 +152,11 @@ def fit_model_and_test_state_10():
   pass
 
 if __name__ == "__main__":
-    load_data()
-    fit_model_and_test_state_2()
-    fit_model_and_test_state_3()
-    fit_model_and_test_state_4()
-    fit_model_and_test_state_5()
-    fit_model_and_test_state_6()
-    fit_model_and_test_state_10()
+  read_attacks()
+  load_data()
+  # fit_model_and_test_state_2()
+  fit_model_and_test_state_3()
+  # fit_model_and_test_state_4()
+  # fit_model_and_test_state_5()
+  # fit_model_and_test_state_6()
+  # fit_model_and_test_state_10()
