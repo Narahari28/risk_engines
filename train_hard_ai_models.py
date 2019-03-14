@@ -17,6 +17,8 @@ y_state_5 = []
 y_state_6 = []
 y_state_10 = []
 all_attacks = []
+all_rolls_attacker = ['retreat', 1, 2, 3]
+all_rolls_defender = [1, 2]
 
 def read_attacks():
   f = open("attacks.txt", "r")
@@ -68,13 +70,26 @@ def load_data():
           observed_class = all_attacks.index(attack_phrase)
           y_state_3.append(observed_class)
         elif gameState == 4:
-          pass
+          countries.append(countries[attack_defend_state.index(1)])
+          countries.append(countries[attack_defend_state.index(-1)])
+          x_state_4.append(countries)
+          if "retreat" in line:
+            roll_phrase = "retreat"
+          else:
+            roll_phrase = get_trailing_number(line)
+          observed_class = all_rolls_attacker.index(roll_phrase)
+          y_state_4.append(observed_class)
         elif gameState == 5:
           pass
         elif gameState == 6:
           pass
         elif gameState == 10:
-          pass
+          countries.append(countries[attack_defend_state.index(1)])
+          countries.append(countries[attack_defend_state.index(-1)])
+          x_state_10.append(countries)
+          roll_phrase = get_trailing_number(line)
+          observed_class = all_rolls_defender.index(roll_phrase)
+          y_state_10.append(observed_class)
         currentlyTracking = False  # So we don't hit this case on the 2nd set of "--" after output line
         readingCountries = False
         gameState = -1
@@ -140,7 +155,25 @@ def fit_model_and_test_state_3():
   print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~29.5%, much better than 1/20 (20 valid attacks on average)
 
 def fit_model_and_test_state_4():
-  pass
+  x_train, x_test, y_train, y_test = train_test_split(x_state_4, y_state_4, test_size=0.3,random_state=109)
+  model = GaussianNB()
+  model.fit(x_train, y_train)
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      rollPhrase = all_rolls_attacker[j]
+      countryCount = x_test[i][-2]
+      isValidRoll = rollPhrase == 'retreat' or countryCount > rollPhrase
+      if(val >= max_prob and isValidRoll):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 4 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 67.3%, much better than 1/4 (4 options in general)
 
 def fit_model_and_test_state_5():
   pass
@@ -149,13 +182,31 @@ def fit_model_and_test_state_6():
   pass
 
 def fit_model_and_test_state_10():
-  pass
+  x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
+  model = GaussianNB()
+  model.fit(x_train, y_train)
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      rollPhrase = all_rolls_defender[j]
+      countryCount = x_test[i][-1]
+      isValidRoll = countryCount >= rollPhrase
+      if(val >= max_prob and isValidRoll):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 10 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 100%, much better than 1/2 (2 options in general)
 
 if __name__ == "__main__":
   read_attacks()
   load_data()
   # fit_model_and_test_state_2()
-  fit_model_and_test_state_3()
+  # fit_model_and_test_state_3()
   # fit_model_and_test_state_4()
   # fit_model_and_test_state_5()
   # fit_model_and_test_state_6()
