@@ -1,4 +1,4 @@
-import re
+from __future__ import division
 from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
@@ -104,7 +104,14 @@ def load_data():
             all_battle_won_moves.append(observed_class)
           y_state_5.append(observed_class)
         elif gameState == 6:
-          pass
+          x_state_6.append(countries)
+          if "nomove" in line:
+            observed_class = "nomove"
+          else:
+            observed_class = " ".join(line.split()[-3:])
+          if observed_class not in all_fortifying_moves:
+            all_fortifying_moves.append(observed_class)
+          y_state_6.append(observed_class)
         elif gameState == 10:
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
@@ -135,6 +142,8 @@ def load_data():
   all_battle_won_moves.sort()
   for i in range(len(y_state_5)):
     y_state_5[i] = all_battle_won_moves.index(y_state_5[i])
+  for i in range(len(y_state_6)):
+    y_state_6[i] = all_fortifying_moves.index(y_state_6[i])
 
 def get_trailing_number(s):
   return int(s.split()[-1])
@@ -257,7 +266,38 @@ def fit_model_and_test_state_5():
 #   print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 19%
 
 def fit_model_and_test_state_6():
-  pass
+  x_train, x_test, y_train, y_test = train_test_split(x_state_6, y_state_6, test_size=0.3,random_state=109)
+  model = GaussianNB()
+  model.fit(x_train, y_train)
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  correct_pair_cnt = 0
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      potentialMove = all_fortifying_moves[j]
+      if(potentialMove == "nomove"):
+        isValidMove = True
+      else:
+        source = int(potentialMove.split()[0])
+        destination = int(potentialMove.split()[1])
+        armies = int(potentialMove.split()[2])
+        isValidMove = x_test[source] > armies and x_test[destination] >= 0
+      if(val >= max_prob and isValidMove):
+        max_prob = val
+        ans = j
+    actualMove = all_fortifying_moves[y_test[i]]
+    suggestedMove = all_fortifying_moves[ans]
+    if actualMove == 'nomove' and suggestedMove == 'nomove':
+      correct_pair_cnt += 1
+    if actualMove != 'nomove' and suggestedMove != 'nomove' and int(suggestedMove.split()[0]) == int(actualMove.split()[0]) and int(suggestedMove.split()[1]) == int(actualMove.split()[1]):
+      correct_pair_cnt += 1
+    y_pred.append(ans)
+  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 8.7%, much better than 1/530 (530 observed options in total)
+  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 9.4%, much better than 1/164 (164 possible options in total)
 
 def fit_model_and_test_state_10():
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
@@ -286,7 +326,7 @@ if __name__ == "__main__":
   # fit_model_and_test_state_2()
   # fit_model_and_test_state_3()
   # fit_model_and_test_state_4()
-  fit_model_and_test_state_5()
+  # fit_model_and_test_state_5()
   # fit_model_and_test_state_5_worse()
-  # fit_model_and_test_state_6()
+  fit_model_and_test_state_6()
   # fit_model_and_test_state_10()
