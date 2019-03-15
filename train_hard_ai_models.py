@@ -17,6 +17,8 @@ y_state_5 = []
 y_state_6 = []
 y_state_10 = []
 all_attacks = []
+all_fortifying_moves = []
+all_battle_won_moves = []
 all_rolls_attacker = ['retreat', 1, 2, 3]
 all_rolls_defender = [1, 2]
 
@@ -36,10 +38,12 @@ def load_data():
   currentlyTracking = False
   readingCountries = False
   gameState = -1
+  mustMove = 0
   countries = []
   attack_defend_state = []
   attacker = None
   defender = None
+  allMoves = []
 
   while line:
     if line == "Current player: Hard":
@@ -53,6 +57,8 @@ def load_data():
         defender = get_trailing_country(line)
       elif "Countries:" in line:
         readingCountries = True
+      elif "Must move:" in line:
+        mustMove = get_trailing_number(line)
       elif "--" in line:
         line = f.readline() # Format "Output: [chosen command]"
         if gameState == 1:
@@ -80,7 +86,23 @@ def load_data():
           observed_class = all_rolls_attacker.index(roll_phrase)
           y_state_4.append(observed_class)
         elif gameState == 5:
-          pass
+          #### Code for worse encoding of features
+          # attackInd = attack_defend_state.index(1)
+          # attackAmount = countries[attackInd]
+          # countries.append(attackAmount)
+          # countries.append(mustMove)
+          # x_state_5.append(countries)
+          # observed_class = get_trailing_number(line)
+          # if observed_class not in all_battle_won_moves:
+          #   all_battle_won_moves.append(observed_class)
+          # y_state_5.append(observed_class)
+          countries.extend(attack_defend_state)
+          countries.append(mustMove)
+          x_state_5.append(countries)
+          observed_class = get_trailing_number(line)
+          if observed_class not in all_battle_won_moves:
+            all_battle_won_moves.append(observed_class)
+          y_state_5.append(observed_class)
         elif gameState == 6:
           pass
         elif gameState == 10:
@@ -93,6 +115,7 @@ def load_data():
         currentlyTracking = False  # So we don't hit this case on the 2nd set of "--" after output line
         readingCountries = False
         gameState = -1
+        mustMove = 0
         countries = []
         attacker = None
         defender = None
@@ -109,12 +132,19 @@ def load_data():
         else:
           attack_defend_state.append(0)
     line = f.readline().strip()
+  all_battle_won_moves.sort()
+  for i in range(len(y_state_5)):
+    y_state_5[i] = all_battle_won_moves.index(y_state_5[i])
 
 def get_trailing_number(s):
   return int(s.split()[-1])
 
 def get_trailing_country(s):
   return " ".join(s.split()[1:])
+
+def split_list(a_list):
+    half = len(a_list)//2
+    return a_list[:half], a_list[half:]
 
 def fit_model_and_test_state_2():
   x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
@@ -176,7 +206,55 @@ def fit_model_and_test_state_4():
   print("State 4 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 67.3%, much better than 1/4 (4 options in general)
 
 def fit_model_and_test_state_5():
-  pass
+  x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
+  model = GaussianNB()
+  model.fit(x_train, y_train)
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    mustMove = row[-1]
+    max_prob = 0
+    ans = -1
+    countries, attack_defend_state = split_list(x_test[i][:-1])
+    attackInd = attack_defend_state.index(1)
+    maxMove = countries[attackInd] - 1
+    for j in range(len(row)):
+      val = row[j]
+      potentialMoveCount = all_battle_won_moves[j]
+      isValidMove = potentialMoveCount >= mustMove and potentialMoveCount <= maxMove
+      if(val >= max_prob and isValidMove):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 31.6%, much better than 1/74 (74 observed options in total)
+
+
+# def fit_model_and_test_state_5_worse():
+#   print all_battle_won_moves
+#   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
+#   model = GaussianNB()
+#   model.fit(x_train, y_train)
+#   test_likelihoods = model.predict_proba(x_test)
+#   y_pred = []
+#   for i in range(len(x_test)):
+#     row = test_likelihoods[i]
+#     print row
+#     print x_test[i]
+#     mustMove = x_test[i][-1]
+#     maxMove = x_test[i][-2]
+#     max_prob = 0
+#     ans = -1
+#     for j in range(len(row)):
+#       val = row[j]
+#       potentialMoveCount = all_battle_won_moves[j]
+#       isValidMove = potentialMoveCount >= mustMove and potentialMoveCount <= maxMove
+#       if(val >= max_prob and isValidMove):
+#         max_prob = val
+#         ans = j
+#     print ans, y_test[i]
+#     y_pred.append(ans)
+#   print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 19%
 
 def fit_model_and_test_state_6():
   pass
@@ -208,6 +286,7 @@ if __name__ == "__main__":
   # fit_model_and_test_state_2()
   # fit_model_and_test_state_3()
   # fit_model_and_test_state_4()
-  # fit_model_and_test_state_5()
+  fit_model_and_test_state_5()
+  # fit_model_and_test_state_5_worse()
   # fit_model_and_test_state_6()
-  fit_model_and_test_state_10()
+  # fit_model_and_test_state_10()
