@@ -1,3 +1,4 @@
 game_state.txt
+*.pkl
 saves/*
 easy_vs_hard.txt

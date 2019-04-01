@@ -2,6 +2,7 @@ from __future__ import division
 from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
+import pickle
 
 # Note that we are ignoring game state = 1 because the bestTrade function is available
 x_state_2 = [] # Place armies
@@ -160,6 +161,7 @@ def fit_model_and_test_state_2():
   x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
+  pickle.dump(model, open('model2.pkl','wb'))
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
   for i in range(len(x_test)):
@@ -178,6 +180,7 @@ def fit_model_and_test_state_3():
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
+  pickle.dump(model, open('model3.pkl','wb'))
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
   for i in range(len(x_test)):
@@ -198,6 +201,7 @@ def fit_model_and_test_state_4():
   x_train, x_test, y_train, y_test = train_test_split(x_state_4, y_state_4, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
+  pickle.dump(model, open('model4.pkl','wb'))
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
   for i in range(len(x_test)):
@@ -219,6 +223,7 @@ def fit_model_and_test_state_5():
   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
+  pickle.dump(model, open('model5.pkl','wb'))
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
   for i in range(len(x_test)):
@@ -245,6 +250,7 @@ def fit_model_and_test_state_5():
 #   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
 #   model = GaussianNB()
 #   model.fit(x_train, y_train)
+#   pickle.dump(model, open('model5worse.pkl','wb'))
 #   test_likelihoods = model.predict_proba(x_test)
 #   y_pred = []
 #   for i in range(len(x_test)):
@@ -270,6 +276,7 @@ def fit_model_and_test_state_6():
   x_train, x_test, y_train, y_test = train_test_split(x_state_6, y_state_6, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
+  pickle.dump(model, open('model6.pkl','wb'))
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
   correct_pair_cnt = 0
@@ -304,6 +311,7 @@ def fit_model_and_test_state_10():
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
+  pickle.dump(model, open('model10.pkl','wb'))
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
   for i in range(len(x_test)):
