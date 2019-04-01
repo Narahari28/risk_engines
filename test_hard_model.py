@@ -2,7 +2,6 @@ from __future__ import division
 from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
-import pickle
 
 # Note that we are ignoring game state = 1 because the bestTrade function is available
 x_state_2 = [] # Place armies
@@ -157,56 +156,178 @@ def split_list(a_list):
     half = len(a_list)//2
     return a_list[:half], a_list[half:]
 
-def fit_model_state_2():
+def fit_model_and_test_state_2():
   x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
-  pickle.dump(model, open('model2.pkl','wb'))
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      if(val >= max_prob and x_test[i][j] >= 0): # Better than previous best and is not opponent's country
+        max_prob = val
+        ans = j + 1
+    y_pred.append(ans)
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~28%, much better than 1/21 (own 21 countries on average)
 
-def fit_model_state_3():
+def fit_model_and_test_state_3():
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
-  pickle.dump(model, open('model3.pkl','wb'))
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      attackPhrase = all_attacks[j]
+      isValidAttack = attackPhrase == "endattack" or ((x_test[i][int(attackPhrase.split()[0]) - 1] >= 0) and (x_test[i][int(attackPhrase.split()[1]) - 1] <= 0))
+      if(val >= max_prob and isValidAttack):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~29.5%, much better than 1/20 (20 valid attacks on average)
 
-def fit_model_state_4():
+def fit_model_and_test_state_4():
   x_train, x_test, y_train, y_test = train_test_split(x_state_4, y_state_4, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
-  pickle.dump(model, open('model4.pkl','wb'))
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      rollPhrase = all_rolls_attacker[j]
+      countryCount = x_test[i][-2]
+      isValidRoll = rollPhrase == 'retreat' or countryCount > rollPhrase
+      if(val >= max_prob and isValidRoll):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 4 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 67.3%, much better than 1/4 (4 options in general)
 
-def fit_model_state_5():
+def fit_model_and_test_state_5():
   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
-  pickle.dump(model, open('model5.pkl','wb'))
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    mustMove = row[-1]
+    max_prob = 0
+    ans = -1
+    countries, attack_defend_state = split_list(x_test[i][:-1])
+    attackInd = attack_defend_state.index(1)
+    maxMove = countries[attackInd] - 1
+    for j in range(len(row)):
+      val = row[j]
+      potentialMoveCount = all_battle_won_moves[j]
+      isValidMove = potentialMoveCount >= mustMove and potentialMoveCount <= maxMove
+      if(val >= max_prob and isValidMove):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 31.6%, much better than 1/74 (74 observed options in total)
+
 
 # def fit_model_and_test_state_5_worse():
 #   print all_battle_won_moves
 #   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
 #   model = GaussianNB()
 #   model.fit(x_train, y_train)
-#   pickle.dump(model, open('model5worse.pkl','wb'))
+#   test_likelihoods = model.predict_proba(x_test)
+#   y_pred = []
+#   for i in range(len(x_test)):
+#     row = test_likelihoods[i]
+#     print row
+#     print x_test[i]
+#     mustMove = x_test[i][-1]
+#     maxMove = x_test[i][-2]
+#     max_prob = 0
+#     ans = -1
+#     for j in range(len(row)):
+#       val = row[j]
+#       potentialMoveCount = all_battle_won_moves[j]
+#       isValidMove = potentialMoveCount >= mustMove and potentialMoveCount <= maxMove
+#       if(val >= max_prob and isValidMove):
+#         max_prob = val
+#         ans = j
+#     print ans, y_test[i]
+#     y_pred.append(ans)
+#   print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 19%
 
-def fit_model_state_6():
+def fit_model_and_test_state_6():
   x_train, x_test, y_train, y_test = train_test_split(x_state_6, y_state_6, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
-  pickle.dump(model, open('model6.pkl','wb'))
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  correct_pair_cnt = 0
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      potentialMove = all_fortifying_moves[j]
+      if(potentialMove == "nomove"):
+        isValidMove = True
+      else:
+        source = int(potentialMove.split()[0])
+        destination = int(potentialMove.split()[1])
+        armies = int(potentialMove.split()[2])
+        isValidMove = x_test[source] > armies and x_test[destination] >= 0
+      if(val >= max_prob and isValidMove):
+        max_prob = val
+        ans = j
+    actualMove = all_fortifying_moves[y_test[i]]
+    suggestedMove = all_fortifying_moves[ans]
+    if actualMove == 'nomove' and suggestedMove == 'nomove':
+      correct_pair_cnt += 1
+    if actualMove != 'nomove' and suggestedMove != 'nomove' and int(suggestedMove.split()[0]) == int(actualMove.split()[0]) and int(suggestedMove.split()[1]) == int(actualMove.split()[1]):
+      correct_pair_cnt += 1
+    y_pred.append(ans)
+  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 8.7%, much better than 1/530 (530 observed options in total)
+  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 9.4%, much better than 1/164 (164 possible options in total)
 
-def fit_model_state_10():
+def fit_model_and_test_state_10():
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
   model = GaussianNB()
   model.fit(x_train, y_train)
-  pickle.dump(model, open('model10.pkl','wb'))
+  test_likelihoods = model.predict_proba(x_test)
+  y_pred = []
+  for i in range(len(x_test)):
+    row = test_likelihoods[i]
+    max_prob = 0
+    ans = -1
+    for j in range(len(row)):
+      val = row[j]
+      rollPhrase = all_rolls_defender[j]
+      countryCount = x_test[i][-1]
+      isValidRoll = countryCount >= rollPhrase
+      if(val >= max_prob and isValidRoll):
+        max_prob = val
+        ans = j
+    y_pred.append(ans)
+  print("State 10 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 100%, much better than 1/2 (2 options in general)
 
 if __name__ == "__main__":
   read_attacks()
   load_data()
-  fit_model_state_2()
-  fit_model_state_3()
-  fit_mode_state_4()
-  fit_model_state_5()
+  fit_model_and_test_state_2()
+  fit_model_and_test_state_3()
+  fit_model_and_test_state_4()
+  fit_model_and_test_state_5()
   # fit_model_and_test_state_5_worse()
-  fit_model_state_6()
-  fit_model_state_10()
+  fit_model_and_test_state_6()
+  fit_model_and_test_state_10()
