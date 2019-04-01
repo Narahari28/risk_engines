@@ -65,10 +65,12 @@ def load_data():
           pass
         elif gameState == 2:
           x_state_2.append(countries)
+          print("2 [" + ', '.join(str(c) for c in countries) + ']')
           observed_class = int(line.split()[-2]) # e.g. 39
           y_state_2.append(observed_class)
         elif gameState == 3:
           x_state_3.append(countries)
+          print("3 [" + ', '.join(str(c) for c in countries) + ']')
           if "endattack" in line:
             attack_phrase = "endattack"
           else:
@@ -79,6 +81,7 @@ def load_data():
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
           x_state_4.append(countries)
+          print("4 [" + ', '.join(str(c) for c in countries) + ']')
           if "retreat" in line:
             roll_phrase = "retreat"
           else:
@@ -99,12 +102,14 @@ def load_data():
           countries.extend(attack_defend_state)
           countries.append(mustMove)
           x_state_5.append(countries)
+          print("5 [" + ', '.join(str(c) for c in countries) + ']')
           observed_class = get_trailing_number(line) # Positive number
           if observed_class not in all_battle_won_moves:
             all_battle_won_moves.append(observed_class)
           y_state_5.append(observed_class)
         elif gameState == 6:
           x_state_6.append(countries)
+          print("6 [" + ', '.join(str(c) for c in countries) + ']')
           if "nomove" in line:
             observed_class = "nomove"
           else:
@@ -116,6 +121,7 @@ def load_data():
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
           x_state_10.append(countries)
+          print("10 [" + ', '.join(str(c) for c in countries) + ']')
           roll_phrase = get_trailing_number(line)
           observed_class = all_rolls_defender.index(roll_phrase)
           y_state_10.append(observed_class) # Encoding not so important on this case since basically always roll as much as possible

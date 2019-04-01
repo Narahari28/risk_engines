@@ -114,24 +114,24 @@ load_data()
 def predict():
     # Get the data from the POST request.
     data = request.get_json(force=True)
-    gameState = np.array(data['gameState'])
+    print data
+    gameState = data['gameState']
     prediction = None
     if gameState == 2:
-    	prediction = predict_state_2(np.array(data['x_state']))
+    	prediction = predict_state_2(data['x_state'])
     elif gameState == 3:
-    	prediction = predict_state_3(np.array(data['x_state']))
+    	prediction = predict_state_3(data['x_state'])
     elif gameState == 4:
-    	prediction = predict_state_4(np.array(data['x_state']))
+    	prediction = predict_state_4(data['x_state'])
     elif gameState == 5:
-    	prediction = predict_state_5(np.array(data['x_state']))
+    	prediction = predict_state_5(data['x_state'])
     elif gameState == 6:
-    	prediction = predict_state_6(np.array(data['x_state']))
+    	prediction = predict_state_6(data['x_state'])
     elif gameState == 10:
-    	prediction = predict_state_10(np.array(data['x_state']))
+    	prediction = predict_state_10(data['x_state'])
     return jsonify(prediction)
 
 def predict_state_2(x_state):
-	print x_state
 	test_likelihoods = model2.predict_proba([x_state])
 	row = test_likelihoods[0]
 	max_prob = 0
@@ -173,6 +173,7 @@ def predict_state_4(x_state):
 	return all_rolls_attacker[ans]
 
 def predict_state_5(x_state):
+	print(x_state)
 	test_likelihoods = model5.predict_proba([x_state])
 	row = test_likelihoods[0]
 	mustMove = row[-1]
