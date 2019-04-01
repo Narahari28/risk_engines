@@ -3,12 +3,13 @@ from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 
-x_state_2 = [] # Note that we are ignoring game state = 1 because the bestTrade function is available
-x_state_3 = []
-x_state_4 = []
-x_state_5 = []
-x_state_6 = []
-x_state_10 = []
+# Note that we are ignoring game state = 1 because the bestTrade function is available
+x_state_2 = [] # Place armies
+x_state_3 = [] # Attack
+x_state_4 = [] # Roll as attacker
+x_state_5 = [] # Move armies to conquered
+x_state_6 = [] # Fortify
+x_state_10 = [] # Roll as defender
 
 y_state_2 = []
 y_state_3 = []
@@ -16,6 +17,7 @@ y_state_4 = []
 y_state_5 = []
 y_state_6 = []
 y_state_10 = []
+
 all_attacks = []
 all_fortifying_moves = []
 all_battle_won_moves = []
@@ -35,15 +37,14 @@ def load_data():
   f = open("easy_vs_hard.txt", "r")
   line = f.readline().strip()
 
-  currentlyTracking = False
+  currentlyTracking = False # Ignore easy player
   readingCountries = False
   gameState = -1
   mustMove = 0
   countries = []
-  attack_defend_state = []
+  attack_defend_state = [] # All zeroes, except attacker and defender
   attacker = None
   defender = None
-  allMoves = []
 
   while line:
     if line == "Current player: Hard":
@@ -83,7 +84,7 @@ def load_data():
             roll_phrase = "retreat"
           else:
             roll_phrase = get_trailing_number(line)
-          observed_class = all_rolls_attacker.index(roll_phrase)
+          observed_class = all_rolls_attacker.index(roll_phrase) # 0-3
           y_state_4.append(observed_class)
         elif gameState == 5:
           #### Code for worse encoding of features
@@ -99,7 +100,7 @@ def load_data():
           countries.extend(attack_defend_state)
           countries.append(mustMove)
           x_state_5.append(countries)
-          observed_class = get_trailing_number(line)
+          observed_class = get_trailing_number(line) # Positive number
           if observed_class not in all_battle_won_moves:
             all_battle_won_moves.append(observed_class)
           y_state_5.append(observed_class)
@@ -108,7 +109,7 @@ def load_data():
           if "nomove" in line:
             observed_class = "nomove"
           else:
-            observed_class = " ".join(line.split()[-3:])
+            observed_class = " ".join(line.split()[-3:]) # Format "41 39 1"
           if observed_class not in all_fortifying_moves:
             all_fortifying_moves.append(observed_class)
           y_state_6.append(observed_class)
@@ -118,7 +119,7 @@ def load_data():
           x_state_10.append(countries)
           roll_phrase = get_trailing_number(line)
           observed_class = all_rolls_defender.index(roll_phrase)
-          y_state_10.append(observed_class)
+          y_state_10.append(observed_class) # Encoding not so important on this case since basically always roll as much as possible
         currentlyTracking = False  # So we don't hit this case on the 2nd set of "--" after output line
         readingCountries = False
         gameState = -1
