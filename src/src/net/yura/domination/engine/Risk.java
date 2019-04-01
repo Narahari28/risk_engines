@@ -1160,7 +1160,7 @@ public class Risk extends Thread {
 
 						int t=getType(type);
 						int color=ColorUtil.getColor( c );
-
+						
 						if ( color != 0 && t != -1 && !name.equals("") && (   (  unlimitedLocalMode && game.addPlayer(t, name, color, "LOCALGAME" ) ) || ( !unlimitedLocalMode && game.addPlayer(t, name, color, Addr)    )    ) ) {
 							//New player created, name: {0} color: {1}
 							output=RiskUtil.replaceAll(RiskUtil.replaceAll( resb.getString("core.newplayer.created")

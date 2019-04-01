@@ -188,7 +188,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 		cardState=0;
 
 		replayCommands = new Vector();
-		printNewGameNewLine("easy_vs_hard.txt");
+		printNewGameNewLine("easy_vs_emulator.txt");
 
 		//System.out.print("New Game created\n"); // testing
 
@@ -226,9 +226,10 @@ transient - A keyword in the Java programming language that indicates that a fie
 	 */
 	public boolean addPlayer(int type, String name, int color, String a) {
 		if (gameState==STATE_NEW_GAME ) { // && !name.equals("neutral") && !(color==Color.gray)
-
 			for (int c=0; c< Players.size() ; c++) {
-				if (( name.equals(((Player)Players.elementAt(c)).getName() )) || (color ==  ((Player)Players.elementAt(c)).getColor() )) return false;
+				if (( name.equals(((Player)Players.elementAt(c)).getName() )) || (color ==  ((Player)Players.elementAt(c)).getColor() )) {
+					return false;
+				}
 			}
 
 			//System.out.print("Player added. Type: " +type+ "\n"); // testing
@@ -236,7 +237,9 @@ transient - A keyword in the Java programming language that indicates that a fie
 			Players.add(player);
 			return true;
 		}
-		else return false;
+		else {
+			return false;
+		}
 	}
 
 	/**
@@ -1470,7 +1473,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 		if (result==true) {
 			gameState=STATE_GAME_OVER;
 			try {
-				printGameWonBy(this.currentPlayer, "easy_vs_hard.txt");
+				printGameWonBy(this.currentPlayer, "easy_vs_emulator.txt");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

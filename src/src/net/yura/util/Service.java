@@ -6,9 +6,9 @@ import java.util.*;
 
 /**
  * After the Service class from Sun and the Apache project.
- * With help from FrŽdŽric Miserey.
+ * With help from Frï¿½dï¿½ric Miserey.
  *
- * @credits FrŽdŽric Miserey, Joseph Oettinger
+ * @credits Frï¿½dï¿½ric Miserey, Joseph Oettinger
  * @author Matthias L. Jugel
  * @version $id$
  */
@@ -56,6 +56,7 @@ public class Service {
         while (providerFiles.hasMoreElements()) {
           try {
             URL url = (URL) providerFiles.nextElement();
+            
             Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
             if (instantiate) {
               loadResource(reader, classLoader, providers);
@@ -86,7 +87,7 @@ public class Service {
     return providers.iterator();
   }
 
-  private static List loadClasses(Reader input, ClassLoader classLoader, List classes) throws IOException {
+  private static List loadClasses(Reader input, ClassLoader classLoader, List classes) throws IOException {	
     BufferedReader reader = new BufferedReader(input);
 
     String line = reader.readLine();

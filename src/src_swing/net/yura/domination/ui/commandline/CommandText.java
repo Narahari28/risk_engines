@@ -118,8 +118,8 @@ public class CommandText extends Thread {
 	 * loops through when Input is needed
 	 */
 	public void run() {
-		String[] commands = {"newgame", "newplayer ai easy black Easy", "newplayer ai hard blue Hard", "startgame domination increasing", "closegame"};
-		int totalIterations = 400*commands.length;
+		String[] commands = {"newgame", "newplayer ai easy black Easy", "newplayer ai emulator blue Emulator", "startgame domination increasing", "closegame"};
+		int totalIterations = 1*commands.length;
 		int currentIterations = 0;
 		while(true) {
 			if(currentIterations >= totalIterations) {
