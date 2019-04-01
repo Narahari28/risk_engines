@@ -114,7 +114,6 @@ load_data()
 def predict():
     # Get the data from the POST request.
     data = request.get_json(force=True)
-    print data
     gameState = data['gameState']
     prediction = None
     if gameState == 2:

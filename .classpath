@@ -9,8 +9,6 @@
 	<classpathentry kind="src" path="src/src_mapstore"/>
 	<classpathentry kind="lib" path="Domination.jar"/>
 	<classpathentry kind="lib" path="lib/Grasshopper.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-4.1.2.jar"/>
-	<classpathentry kind="lib" path="lib/httpmime-4.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/LobbyCore.jar"/>
 	<classpathentry kind="lib" path="lib/m3gbasic.jar"/>
 	<classpathentry kind="lib" path="lib/midletrunner.jar"/>
@@ -20,5 +18,8 @@
 	<classpathentry kind="lib" path="/Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home/jre/lib/javaws.jar"/>
 	<classpathentry kind="lib" path="/Users/naraharibharadwaj/Downloads/jfreechart-1.0.19/lib/jcommon-1.0.23.jar"/>
 	<classpathentry kind="lib" path="/Users/naraharibharadwaj/Downloads/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar"/>
+	<classpathentry kind="lib" path="/Users/naraharibharadwaj/Downloads/HttpClient/httpcomponents-client-4.5.8/lib/httpclient-4.5.8.jar"/>
+	<classpathentry kind="lib" path="/Users/naraharibharadwaj/Downloads/HttpClient/httpcomponents-client-4.5.8/lib/httpcore-4.4.11.jar"/>
+	<classpathentry kind="lib" path="/Users/naraharibharadwaj/Downloads/HttpClient/httpcomponents-client-4.5.8/lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

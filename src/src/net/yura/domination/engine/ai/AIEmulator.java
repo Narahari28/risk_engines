@@ -2,8 +2,16 @@
 
 package net.yura.domination.engine.ai;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
+
 import net.yura.domination.engine.core.Card;
 import net.yura.domination.engine.core.Country;
 import net.yura.domination.engine.core.Player;
@@ -78,11 +86,86 @@ public class AIEmulator implements AI {
             return output;
     }
 
-    public String getPlaceArmies() {
-		if ( game.NoEmptyCountries()==false ) {
-		    return "autoplace";
+    public String performGetRequest() {
+			String USER_AGENT = "Mozilla/5.0";
+		String url = "http://www.google.com/search?q=java";
+
+		URL obj = null;
+		try {
+			obj = new URL(url);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return getPlaceCommand(randomCountry(player.getTerritoriesOwned()), player.getExtraArmies()/3 + player.getExtraArmies()%3);
+		HttpURLConnection con = null;
+		try {
+			con = (HttpURLConnection) obj.openConnection();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		// optional default is GET
+		try {
+			con.setRequestMethod("GET");
+		} catch (ProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//add request header
+		con.setRequestProperty("User-Agent", USER_AGENT);
+
+		int responseCode = 0;
+		try {
+			responseCode = con.getResponseCode();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("\nSending 'GET' request to URL : " + url);
+		System.out.println("Response Code : " + responseCode);
+
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(
+			        new InputStreamReader(con.getInputStream()));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		try {
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			in.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response.toString();
+    }
+
+    public String getPlaceArmies() {
+		Country[] countries = game.getCountries();
+		Integer[] armies = new Integer[countries.length];
+		for(int i = 0; i < countries.length; i++) {
+			if(countries[i].getOwner() == null) {
+				armies[i] = 0;
+			} else {
+				armies[i] = countries[i].getOwner().getName().equals("Emulator") ? countries[i].getArmies() : -countries[i].getArmies();
+			}
+		}
+		System.out.println(performGetRequest());
+		return "autoplace";
     }
 
     public String getAttack() {
