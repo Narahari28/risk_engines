@@ -33,7 +33,6 @@ def read_attacks():
     line = f.readline().strip()
 
 def load_data():
-  lines = []
   f = open("easy_vs_hard.txt", "r")
   line = f.readline().strip()
 
@@ -286,7 +285,7 @@ def fit_model_and_test_state_6():
         source = int(potentialMove.split()[0])
         destination = int(potentialMove.split()[1])
         armies = int(potentialMove.split()[2])
-        isValidMove = x_test[source] > armies and x_test[destination] >= 0
+        isValidMove = x_test[i][source - 1] > armies and x_test[i][destination - 1] >= 0
       if(val >= max_prob and isValidMove):
         max_prob = val
         ans = j
@@ -297,8 +296,8 @@ def fit_model_and_test_state_6():
     if actualMove != 'nomove' and suggestedMove != 'nomove' and int(suggestedMove.split()[0]) == int(actualMove.split()[0]) and int(suggestedMove.split()[1]) == int(actualMove.split()[1]):
       correct_pair_cnt += 1
     y_pred.append(ans)
-  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 8.7%, much better than 1/530 (530 observed options in total)
-  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 9.4%, much better than 1/164 (164 possible options in total)
+  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 17.3%, much better than 1/530 (530 observed options in total)
+  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 19.7%, much better than 1/164 (164 possible options in total)
 
 def fit_model_and_test_state_10():
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)

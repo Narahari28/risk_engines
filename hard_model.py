@@ -34,7 +34,6 @@ def read_attacks():
     line = f.readline().strip()
 
 def load_data():
-  lines = []
   f = open("easy_vs_hard.txt", "r")
   line = f.readline().strip()
 
@@ -153,10 +152,6 @@ def get_trailing_number(s):
 def get_trailing_country(s):
   return " ".join(s.split()[1:])
 
-def split_list(a_list):
-    half = len(a_list)//2
-    return a_list[:half], a_list[half:]
-
 def fit_model_state_2():
   x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
   model = GaussianNB()
@@ -205,7 +200,7 @@ if __name__ == "__main__":
   load_data()
   fit_model_state_2()
   fit_model_state_3()
-  fit_mode_state_4()
+  fit_model_state_4()
   fit_model_state_5()
   # fit_model_and_test_state_5_worse()
   fit_model_state_6()
