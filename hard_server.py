@@ -173,7 +173,6 @@ def predict_state_4(x_state):
 	return all_rolls_attacker[ans]
 
 def predict_state_5(x_state):
-	print(x_state)
 	test_likelihoods = model5.predict_proba([x_state])
 	row = test_likelihoods[0]
 	mustMove = row[-1]
