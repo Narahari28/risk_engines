@@ -57,8 +57,11 @@ public class AIEmulator implements AI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(ans.equals("\"nomove\"")) {
-			return "nomove";
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
+		if(ans.equals("nomove")) {
+			return ans;
 		}
 		return "movearmies " + ans;
     }
@@ -162,6 +165,9 @@ public class AIEmulator implements AI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
 		return "placearmies " + ans + " 1";
     }
 
@@ -173,7 +179,9 @@ public class AIEmulator implements AI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		ans = ans.substring(1, ans.length() - 1);
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
 		if(ans.equals("endattack")) return ans;
 		return "attack " + ans;
     }
@@ -201,7 +209,10 @@ public class AIEmulator implements AI {
     		} catch (Exception e) {
     			e.printStackTrace();
     		}
-    		if(ans.equals("\"retreat\"")) {
+    		if(ans.contains("\"")) {
+    			ans = ans.substring(1, ans.length() - 1);
+    		}
+    		if(ans.equals("retreat")) {
     			if(commands.get(commands.size() - 1).contains("attack")) { // To avoid infinite loops of attack and retreat, must be done here because Python server doesn't have access to prev commands
     				ans = "1";
     			} else {
