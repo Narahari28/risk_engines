@@ -14,6 +14,7 @@ model10 = pickle.load(open('model10.pkl','rb'))
 all_attacks = []
 all_fortifying_moves = []
 all_battle_won_moves = []
+all_placearmies = []
 all_rolls_attacker = ['retreat', 1, 2, 3]
 all_rolls_defender = [1, 2]
 
@@ -57,7 +58,9 @@ def load_data():
         if gameState == 1:
           pass
         elif gameState == 2:
-          pass
+          observed_class = ' '.join((line.split()[-2:])) # e.g. 39
+          if observed_class not in all_placearmies:
+            all_placearmies.append(observed_class)
         elif gameState == 3:
           pass
         elif gameState == 4:
@@ -137,14 +140,18 @@ def predict_state_2(x_state):
 	max_prob = 0
 	ans = -1
 	for j in range(len(row)):
-	  val = row[j]
-	  if is_initial_phase and x_state[j] != 0:
-	  	continue
-	  if not is_initial_phase and x_state[j] < 0:
-	  	continue
-	  if(val >= max_prob): # Better than previous best and is not opponent's country
-	    max_prob = val
-	    ans = j + 1
+		potentialMove = all_placearmies[j]
+		country = int(potentialMove.split()[0])
+		count = int(potentialMove.split()[1])
+		maxPlace = x_state[-1]
+		val = row[j]
+		if(is_initial_phase and (x_state[country - 1] != 0 or count > 1)):
+			continue
+		if(not is_initial_phase and x_state[country - 1] < 0):
+			continue
+		if(val >= max_prob and count <= maxPlace): # Better than previous best and is not opponent's country
+			max_prob = val
+			ans = all_placearmies[j]
 	return ans
 
 def predict_state_3(x_state):

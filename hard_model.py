@@ -22,6 +22,7 @@ y_state_10 = []
 all_attacks = []
 all_fortifying_moves = []
 all_battle_won_moves = []
+all_placearmies = []
 all_rolls_attacker = ['retreat', 1, 2, 3]
 all_rolls_defender = [1, 2]
 
@@ -65,8 +66,11 @@ def load_data():
         if gameState == 1:
           pass
         elif gameState == 2:
+          countries.append(100) # Say that max to place is 100
           x_state_2.append(countries)
-          observed_class = int(line.split()[-2]) # e.g. 39
+          observed_class = ' '.join((line.split()[-2:])) # e.g. 39
+          if observed_class not in all_placearmies:
+            all_placearmies.append(observed_class)
           y_state_2.append(observed_class)
         elif gameState == 3:
           x_state_3.append(countries)

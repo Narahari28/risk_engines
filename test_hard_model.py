@@ -21,6 +21,7 @@ y_state_10 = []
 all_attacks = []
 all_fortifying_moves = []
 all_battle_won_moves = []
+all_placearmies = []
 all_rolls_attacker = ['retreat', 1, 2, 3]
 all_rolls_defender = [1, 2]
 
@@ -64,9 +65,12 @@ def load_data():
         if gameState == 1:
           pass
         elif gameState == 2:
+          countries.append(100) # Say that max to place is 100
           x_state_2.append(countries)
           # print("2 [" + ', '.join(str(c) for c in countries) + ']')
-          observed_class = int(line.split()[-2]) # e.g. 39
+          observed_class = ' '.join((line.split()[-2:])) # e.g. 39
+          if observed_class not in all_placearmies:
+            all_placearmies.append(observed_class)
           y_state_2.append(observed_class)
         elif gameState == 3:
           x_state_3.append(countries)
@@ -146,6 +150,8 @@ def load_data():
           attack_defend_state.append(0)
     line = f.readline().strip()
   all_battle_won_moves.sort()
+  for i in range(len(y_state_2)):
+    y_state_2[i] = all_placearmies.index(y_state_2[i])
   for i in range(len(y_state_5)):
     y_state_5[i] = all_battle_won_moves.index(y_state_5[i])
   for i in range(len(y_state_6)):
@@ -173,16 +179,20 @@ def fit_model_and_test_state_2():
     max_prob = 0
     ans = -1
     for j in range(len(row)):
+      potentialMove = all_placearmies[j]
+      country = int(potentialMove.split()[0])
+      count = int(potentialMove.split()[1])
+      maxPlace = x_test[i][-1]
       val = row[j]
-      if(is_initial_phase and x_test[i][j] != 0):
+      if(is_initial_phase and (x_test[i][country - 1] != 0 or count > 1)):
         continue
-      if(not is_initial_phase and x_test[i][j] < 0):
+      if(not is_initial_phase and x_test[i][country - 1] < 0):
         continue
-      if(val >= max_prob): # Better than previous best and is not opponent's country
+      if(val >= max_prob and count <= maxPlace): # Better than previous best and is not opponent's country
         max_prob = val
-        ans = j + 1
+        ans = j
     y_pred.append(ans)
-  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~30.3%, much better than 1/21 (own 21 countries on average)
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~13.8%, much better than 1/674 (674 observed placearmies in total)
 
 def fit_model_and_test_state_3():
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
