@@ -185,17 +185,27 @@ public class AIEmulator implements AI {
  	}
 
     public String getPlaceArmies() {
+    		Vector<String> commands = game.getCommands();
 		String ans = "";
 		int[] armies = getArmies();
+		int[] x_state = new int[armies.length + 1];
+		for(int i = 0; i < armies.length; i++) {
+			x_state[i] = armies[i];
+		}
+		x_state[x_state.length - 1] = game.getCurrentPlayer().getExtraArmies();
+		for(int i = commands.size() - 1; i >= 0; i--) {
+			System.out.println(commands.get(i));
+			if(commands.get(i).contains("CARD")) break;
+		}
 		try {
-			ans = sendPost(2, armies);
+			ans = sendPost(2, x_state);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if(ans.contains("\"")) {
 			ans = ans.substring(1, ans.length() - 1);
 		}
-		return "placearmies " + ans + " 1";
+		return "placearmies " + ans;
     }
 
     public String getAttack() {

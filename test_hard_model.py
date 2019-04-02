@@ -175,7 +175,8 @@ def fit_model_and_test_state_2():
   y_pred = []
   for i in range(len(x_test)):
     row = test_likelihoods[i]
-    is_initial_phase = sum(x == 0 for x in x_test[i]) != 0
+    can_only_place_on_new = sum(x == 0 for x in x_test[i][:-1]) != 0
+    can_only_place_one = sum(abs(x) for x in x_test[i][:-1]) <= 80
     max_prob = 0
     ans = -1
     for j in range(len(row)):
@@ -184,15 +185,13 @@ def fit_model_and_test_state_2():
       count = int(potentialMove.split()[1])
       maxPlace = x_test[i][-1]
       val = row[j]
-      if(is_initial_phase and (x_test[i][country - 1] != 0 or count > 1)):
-        continue
-      if(not is_initial_phase and x_test[i][country - 1] < 0):
+      if((can_only_place_one and count > 1) or (can_only_place_on_new and x_test[i][country - 1] != 0) or x_test[i][country - 1] < 0):
         continue
       if(val >= max_prob and count <= maxPlace): # Better than previous best and is not opponent's country
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~13.8%, much better than 1/674 (674 observed placearmies in total)
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~18.2%, much better than 1/674 (674 observed placearmies in total)
 
 def fit_model_and_test_state_3():
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)

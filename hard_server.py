@@ -135,19 +135,18 @@ def predict():
 
 def predict_state_2(x_state):
 	test_likelihoods = model2.predict_proba([x_state])
-	is_initial_phase = sum(x == 0 for x in x_state) != 0
+	can_only_place_on_new = sum(x == 0 for x in x_state[:-1]) != 0
+	can_only_place_one = sum(abs(x) for x in x_state[:-1]) <= 80
 	row = test_likelihoods[0]
 	max_prob = 0
-	ans = -1
+	ans = None
 	for j in range(len(row)):
 		potentialMove = all_placearmies[j]
 		country = int(potentialMove.split()[0])
 		count = int(potentialMove.split()[1])
 		maxPlace = x_state[-1]
 		val = row[j]
-		if(is_initial_phase and (x_state[country - 1] != 0 or count > 1)):
-			continue
-		if(not is_initial_phase and x_state[country - 1] < 0):
+		if((can_only_place_one and count > 1) or (can_only_place_on_new and x_state[country - 1] != 0) or x_state[country - 1] < 0):
 			continue
 		if(val >= max_prob and count <= maxPlace): # Better than previous best and is not opponent's country
 			max_prob = val
