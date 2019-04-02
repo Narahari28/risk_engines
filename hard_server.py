@@ -155,7 +155,7 @@ def predict_state_3(x_state):
 	for j in range(len(row)):
 	  val = row[j]
 	  attackPhrase = all_attacks[j]
-	  isValidAttack = attackPhrase == "endattack" or ((x_state[int(attackPhrase.split()[0]) - 1] >= 0) and (x_state[int(attackPhrase.split()[1]) - 1] <= 0))
+	  isValidAttack = attackPhrase == "endattack" or ((x_state[int(attackPhrase.split()[0]) - 1] > 1) and (x_state[int(attackPhrase.split()[1]) - 1] < 0))
 	  if(val >= max_prob and isValidAttack):
 	    max_prob = val
 	    ans = j

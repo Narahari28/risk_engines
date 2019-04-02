@@ -45,11 +45,11 @@ public class AIEmulator implements AI {
     protected Player player;
 
     public String getBattleWon() {
-	return "move all";
+    		return "move all";
     }
 
     public String getTacMove() {
-	return "nomove";
+    		return "nomove";
     }
 
     public String getTrade() {
@@ -129,11 +129,10 @@ public class AIEmulator implements AI {
  		return response.toString();
 
  	}
-
-    public String getPlaceArmies() {
+ 	
+ 	public int[] getArmies() {
 		Country[] countries = game.getCountries();
 		int[] armies = new int[countries.length];
-		String ans = "";
 		for(int i = 0; i < countries.length; i++) {
 			if(countries[i].getOwner() == null) {
 				armies[i] = 0;
@@ -141,9 +140,14 @@ public class AIEmulator implements AI {
 				armies[i] = countries[i].getOwner().getName().equals("Emulator") ? countries[i].getArmies() : -countries[i].getArmies();
 			}
 		}
+		return armies;
+ 	}
+
+    public String getPlaceArmies() {
+		String ans = "";
+		int[] armies = getArmies();
 		try {
 			ans = sendPost(2, armies);
-			System.out.println(ans);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -151,11 +155,20 @@ public class AIEmulator implements AI {
     }
 
     public String getAttack() {
-    	return "endattack";
+    		String ans = "";
+		int[] armies = getArmies();
+		try {
+			ans = sendPost(3, armies);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		ans = ans.substring(1, ans.length() - 1);
+		if(ans == "endattack") return ans;
+		return "attack " + ans;
     }
 
     public String getRoll() {
-	return "retreat";
+    		return "retreat";
     }
 
     public String getCapital() {
@@ -173,9 +186,4 @@ public class AIEmulator implements AI {
         int n=game.getDefender().getArmies();
         return "roll "+Math.min(game.getMaxDefendDice(), n);
     }
-
-	protected String getPlaceCommand(Country country, int armies) {
-		return "placearmies " + country.getColor() + " " + (!game.getSetupDone()?1:Math.max(1, Math.min(player.getExtraArmies(), armies)));
-	}
-
 }

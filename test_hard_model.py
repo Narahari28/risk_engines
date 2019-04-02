@@ -197,12 +197,12 @@ def fit_model_and_test_state_3():
     for j in range(len(row)):
       val = row[j]
       attackPhrase = all_attacks[j]
-      isValidAttack = attackPhrase == "endattack" or ((x_test[i][int(attackPhrase.split()[0]) - 1] >= 0) and (x_test[i][int(attackPhrase.split()[1]) - 1] <= 0))
+      isValidAttack = attackPhrase == "endattack" or ((x_test[i][int(attackPhrase.split()[0]) - 1] > 1) and (x_test[i][int(attackPhrase.split()[1]) - 1] < 0))
       if(val >= max_prob and isValidAttack):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~29.5%, much better than 1/20 (20 valid attacks on average)
+  print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~32.1%, much better than 1/20 (20 valid attacks on average)
 
 def fit_model_and_test_state_4():
   x_train, x_test, y_train, y_test = train_test_split(x_state_4, y_state_4, test_size=0.3,random_state=109)
