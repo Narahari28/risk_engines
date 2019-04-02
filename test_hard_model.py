@@ -65,7 +65,7 @@ def load_data():
           pass
         elif gameState == 2:
           x_state_2.append(countries)
-          #print("2 [" + ', '.join(str(c) for c in countries) + ']')
+          # print("2 [" + ', '.join(str(c) for c in countries) + ']')
           observed_class = int(line.split()[-2]) # e.g. 39
           y_state_2.append(observed_class)
         elif gameState == 3:
@@ -121,7 +121,7 @@ def load_data():
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
           x_state_10.append(countries)
-          print("10 [" + ', '.join(str(c) for c in countries) + ']')
+          # print("10 [" + ', '.join(str(c) for c in countries) + ']')
           roll_phrase = get_trailing_number(line)
           observed_class = all_rolls_defender.index(roll_phrase)
           y_state_10.append(observed_class) # Encoding not so important on this case since basically always roll as much as possible
@@ -169,15 +169,20 @@ def fit_model_and_test_state_2():
   y_pred = []
   for i in range(len(x_test)):
     row = test_likelihoods[i]
+    is_initial_phase = sum(x == 0 for x in x_test[i]) != 0
     max_prob = 0
     ans = -1
     for j in range(len(row)):
       val = row[j]
-      if(val >= max_prob and x_test[i][j] >= 0): # Better than previous best and is not opponent's country
+      if(is_initial_phase and x_test[i][j] != 0):
+        continue
+      if(not is_initial_phase and x_test[i][j] < 0):
+        continue
+      if(val >= max_prob): # Better than previous best and is not opponent's country
         max_prob = val
         ans = j + 1
     y_pred.append(ans)
-  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~28%, much better than 1/21 (own 21 countries on average)
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~30.3%, much better than 1/21 (own 21 countries on average)
 
 def fit_model_and_test_state_3():
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)

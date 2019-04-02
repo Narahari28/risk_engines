@@ -132,12 +132,17 @@ def predict():
 
 def predict_state_2(x_state):
 	test_likelihoods = model2.predict_proba([x_state])
+	is_initial_phase = sum(x == 0 for x in x_state) != 0
 	row = test_likelihoods[0]
 	max_prob = 0
 	ans = -1
 	for j in range(len(row)):
 	  val = row[j]
-	  if(val >= max_prob and x_state[j] >= 0): # Better than previous best and is not opponent's country
+	  if is_initial_phase and x_state[j] != 0:
+	  	continue
+	  if not is_initial_phase and x_state[j] < 0:
+	  	continue
+	  if(val >= max_prob): # Better than previous best and is not opponent's country
 	    max_prob = val
 	    ans = j + 1
 	return ans

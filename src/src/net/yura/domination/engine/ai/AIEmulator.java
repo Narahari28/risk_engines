@@ -3,14 +3,16 @@
 package net.yura.domination.engine.ai;
 
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import org.json.JSONObject;
 
 import net.yura.domination.engine.core.Card;
 import net.yura.domination.engine.core.Country;
@@ -86,77 +88,52 @@ public class AIEmulator implements AI {
             return output;
     }
 
-    public String performGetRequest() {
-			String USER_AGENT = "Mozilla/5.0";
-		String url = "http://www.google.com/search?q=java";
+ // HTTP POST request
+ 	private String sendPost(int gameState, int[] x_state) throws Exception {
+ 		String url = "http://localhost:5000/api";
+ 		URL obj = new URL(url);
+ 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-		URL obj = null;
-		try {
-			obj = new URL(url);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		HttpURLConnection con = null;
-		try {
-			con = (HttpURLConnection) obj.openConnection();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+ 		//add request header
+ 		con.setRequestMethod("POST");
+ 		con.setRequestProperty("Content-Type", "application/json");
+ 		con.setRequestProperty("Accept", "application/json");
+ 		con.setDoOutput(true);
+ 		con.setDoInput(true);
+ 
+ 		JSONObject state = new JSONObject();
+ 		state.put("gameState", gameState);
+ 		state.put("x_state", x_state);
+ 		
+ 		OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+ 		wr.write(state.toString());
+ 		wr.flush();
+ 		wr.close();
 
-		// optional default is GET
-		try {
-			con.setRequestMethod("GET");
-		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+ 		int responseCode = con.getResponseCode();
+ 		System.out.println("\nSending 'POST' request to URL : " + url);
+ 		System.out.println("Post parameters : " + state.toString());
+ 		System.out.println("Response Code : " + responseCode);
 
-		//add request header
-		con.setRequestProperty("User-Agent", USER_AGENT);
+ 		BufferedReader in = new BufferedReader(
+ 		        new InputStreamReader(con.getInputStream()));
+ 		String inputLine;
+ 		StringBuffer response = new StringBuffer();
 
-		int responseCode = 0;
-		try {
-			responseCode = con.getResponseCode();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
+ 		while ((inputLine = in.readLine()) != null) {
+ 			response.append(inputLine);
+ 		}
+ 		in.close();
+ 		
+ 		//print result
+ 		return response.toString();
 
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(
-			        new InputStreamReader(con.getInputStream()));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		try {
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			in.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return response.toString();
-    }
+ 	}
 
     public String getPlaceArmies() {
 		Country[] countries = game.getCountries();
-		Integer[] armies = new Integer[countries.length];
+		int[] armies = new int[countries.length];
+		String ans = "";
 		for(int i = 0; i < countries.length; i++) {
 			if(countries[i].getOwner() == null) {
 				armies[i] = 0;
@@ -164,12 +141,17 @@ public class AIEmulator implements AI {
 				armies[i] = countries[i].getOwner().getName().equals("Emulator") ? countries[i].getArmies() : -countries[i].getArmies();
 			}
 		}
-		System.out.println(performGetRequest());
-		return "autoplace";
+		try {
+			ans = sendPost(2, armies);
+			System.out.println(ans);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "placearmies " + ans + " 1";
     }
 
     public String getAttack() {
-	return "endattack";
+    	return "endattack";
     }
 
     public String getRoll() {
