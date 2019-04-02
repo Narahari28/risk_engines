@@ -140,7 +140,7 @@ def predict():
     gameState = data['gameState']
     prediction = None
     if gameState == 2:
-    	prediction = predict_state_2(data['x_state'])
+    	prediction = predict_state_2(data['x_state'], data['offLimits'])
     elif gameState == 3:
     	prediction = predict_state_3(data['x_state'])
     elif gameState == 4:
@@ -153,7 +153,7 @@ def predict():
     	prediction = predict_state_10(data['x_state'])
     return jsonify(prediction)
 
-def predict_state_2(x_state):
+def predict_state_2(x_state, offLimits):
 	test_likelihoods = model2.predict_proba([x_state])
 	can_only_place_on_new = sum(x == 0 for x in x_state[:-1]) != 0
 	can_only_place_one = sum(abs(x) for x in x_state[:-1]) <= 80
@@ -166,7 +166,7 @@ def predict_state_2(x_state):
 		count = int(potentialMove.split()[1])
 		maxPlace = x_state[-1]
 		val = row[j]
-		if((can_only_place_one and count > 1) or (can_only_place_on_new and x_state[country - 1] != 0) or x_state[country - 1] < 0):
+		if(country == offLimits or (can_only_place_one and count > 1) or (can_only_place_on_new and x_state[country - 1] != 0) or x_state[country - 1] < 0):
 			continue
 		if(val >= max_prob and count <= maxPlace): # Better than previous best and is not opponent's country
 			max_prob = val
