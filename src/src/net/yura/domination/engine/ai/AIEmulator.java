@@ -50,7 +50,17 @@ public class AIEmulator implements AI {
     }
 
     public String getTacMove() {
-    		return "nomove";
+    		String ans = "";
+		int[] armies = getArmies();
+		try {
+			ans = sendPost(6, armies);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(ans.equals("\"nomove\"")) {
+			return "nomove";
+		}
+		return "movearmies " + ans;
     }
 
     public String getTrade() {
