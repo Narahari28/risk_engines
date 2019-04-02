@@ -193,10 +193,6 @@ public class AIEmulator implements AI {
 			x_state[i] = armies[i];
 		}
 		x_state[x_state.length - 1] = game.getCurrentPlayer().getExtraArmies();
-		for(int i = commands.size() - 1; i >= 0; i--) {
-			System.out.println(commands.get(i));
-			if(commands.get(i).contains("CARD")) break;
-		}
 		try {
 			ans = sendPost(2, x_state);
 		} catch (Exception e) {

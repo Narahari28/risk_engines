@@ -17,6 +17,7 @@ all_battle_won_moves = []
 all_placearmies = []
 all_rolls_attacker = ['retreat', 1, 2, 3]
 all_rolls_defender = [1, 2]
+y_state_2 = []
 
 def read_attacks():
   f = open("attacks.txt", "r")
@@ -38,6 +39,8 @@ def load_data():
   attack_defend_state = [] # All zeroes, except attacker and defender
   attacker = None
   defender = None
+  previousTurnWasPlace = False
+  previousPlaceCountry = None
 
   while line:
     if line == "Current player: Hard":
@@ -58,9 +61,22 @@ def load_data():
         if gameState == 1:
           pass
         elif gameState == 2:
-          observed_class = ' '.join((line.split()[-2:])) # e.g. 39
-          if observed_class not in all_placearmies:
-            all_placearmies.append(observed_class)
+          country = int(line.split()[-2])
+          if previousTurnWasPlace and previousPlaceCountry == country:
+            old_command = y_state_2[len(y_state_2) - 1]
+            old_count = int(old_command.split()[-1])
+            new_count = int(line.split()[-1])
+            total_count = old_count + new_count
+            new_command = str(country) + " " + str(total_count)
+            y_state_2[len(y_state_2) - 1] = new_command
+            if new_command not in all_placearmies:
+              all_placearmies.append(new_command)
+          else:
+            observed_class = ' '.join((line.split()[-2:])) # e.g. "39 1"
+            if observed_class not in all_placearmies:
+              all_placearmies.append(observed_class)
+            y_state_2.append(observed_class)
+            previousPlaceCountry = country
         elif gameState == 3:
           pass
         elif gameState == 4:
@@ -76,6 +92,11 @@ def load_data():
             all_fortifying_moves.append(observed_class)
         elif gameState == 10:
           pass
+        if gameState == 2:
+          previousTurnWasPlace = True
+        else:
+          previousTurnWasPlace = False
+          previousPlaceCountry = None
         currentlyTracking = False  # So we don't hit this case on the 2nd set of "--" after output line
         readingCountries = False
         gameState = -1
