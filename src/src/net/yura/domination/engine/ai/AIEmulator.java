@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 import org.json.JSONObject;
 
@@ -163,12 +164,41 @@ public class AIEmulator implements AI {
 			e.printStackTrace();
 		}
 		ans = ans.substring(1, ans.length() - 1);
-		if(ans == "endattack") return ans;
+		if(ans.equals("endattack")) return ans;
 		return "attack " + ans;
     }
 
     public String getRoll() {
-    		return "retreat";
+    		Vector<String> commands = game.getCommands();
+    		int[] armies = getArmies();
+    		int[] x_state = new int[armies.length + 2];
+    		for(int i = 0; i < armies.length; i++) {
+    			x_state[i] = armies[i];
+    		}
+    		Country attacker = game.getAttacker();
+    		Country defender = game.getDefender();
+    		Country[] allCountries = game.getCountries();
+    		for(int i = 0; i < allCountries.length; i++) {
+    			if(allCountries[i] == attacker) {
+    				x_state[x_state.length - 2] = armies[i];
+    			} else if(allCountries[i] == defender) {
+    				x_state[x_state.length - 1] = armies[i];
+    			}
+    		}
+    		String ans = "";
+    		try {
+    			ans = sendPost(4, x_state);
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    		if(ans.equals("\"retreat\"")) {
+    			if(commands.get(commands.size() - 1).contains("attack")) { // To avoid infinite loops of attack and retreat, must be done here because Python server doesn't have access to prev commands
+    				ans = "1";
+    			} else {
+        			return ans.substring(1, ans.length() - 1);
+    			}
+    		}
+    		return "roll " + ans;
     }
 
     public String getCapital() {
