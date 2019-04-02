@@ -46,7 +46,34 @@ public class AIEmulator implements AI {
     protected Player player;
 
     public String getBattleWon() {
-    		return "move all";
+    		String ans = "";
+		int[] armies = getArmies();
+		Country[] countries = game.getCountries();
+		Country attacker = game.getAttacker();
+		Country defender = game.getDefender();
+		int[] x_state = new int[armies.length + countries.length + 1];
+		for(int i = 0; i < armies.length; i++) {
+			x_state[i] = armies[i];
+		}
+		for(int i = 0; i < countries.length; i++) {
+			if(countries[i] == attacker) {
+				x_state[i + armies.length] = 1;
+			} else if(countries[i] == defender) {
+				x_state[i + armies.length] = -1;
+			} else {
+				x_state[i + armies.length] = 0;
+			}
+		}
+		x_state[x_state.length - 1] = game.getMustMove();
+		try {
+			ans = sendPost(5, x_state);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
+		return "move " + ans;
     }
 
     public String getTacMove() {
@@ -216,7 +243,7 @@ public class AIEmulator implements AI {
     			if(commands.get(commands.size() - 1).contains("attack")) { // To avoid infinite loops of attack and retreat, must be done here because Python server doesn't have access to prev commands
     				ans = "1";
     			} else {
-        			return ans.substring(1, ans.length() - 1);
+        			return ans;
     			}
     		}
     		return "roll " + ans;
@@ -234,7 +261,30 @@ public class AIEmulator implements AI {
     }
 
     public String getAutoDefendString() {
-        int n=game.getDefender().getArmies();
-        return "roll "+Math.min(game.getMaxDefendDice(), n);
+		int[] armies = getArmies();
+		int[] x_state = new int[armies.length + 2];
+		for(int i = 0; i < armies.length; i++) {
+			x_state[i] = armies[i];
+		}
+		Country attacker = game.getAttacker();
+		Country defender = game.getDefender();
+		Country[] allCountries = game.getCountries();
+		for(int i = 0; i < allCountries.length; i++) {
+			if(allCountries[i] == attacker) {
+				x_state[x_state.length - 2] = armies[i];
+			} else if(allCountries[i] == defender) {
+				x_state[x_state.length - 1] = armies[i];
+			}
+		}
+		String ans = "";
+		try {
+			ans = sendPost(10, x_state);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
+		return "roll " + ans;
     }
 }
