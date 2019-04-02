@@ -66,9 +66,7 @@ def load_data():
         elif gameState == 4:
           pass
         elif gameState == 5:
-          observed_class = get_trailing_number(line) # Positive number
-          if observed_class not in all_battle_won_moves:
-            all_battle_won_moves.append(observed_class)
+          pass
         elif gameState == 6:
           if "nomove" in line:
             observed_class = "nomove"
@@ -98,7 +96,8 @@ def load_data():
         else:
           attack_defend_state.append(0)
     line = f.readline().strip()
-  all_battle_won_moves.sort()
+  for i in range(110):
+  	all_battle_won_moves.append(i + 1)
 
 def get_trailing_number(s):
 	return int(s.split()[-1])
@@ -185,7 +184,7 @@ def predict_state_4(x_state):
 def predict_state_5(x_state):
 	test_likelihoods = model5.predict_proba([x_state])
 	row = test_likelihoods[0]
-	mustMove = row[-1]
+	mustMove = x_state[-1]
 	max_prob = 0
 	ans = -1
 	countries, attack_defend_state = split_list(x_state[:-1])
@@ -197,8 +196,8 @@ def predict_state_5(x_state):
 	  isValidMove = potentialMoveCount >= mustMove and potentialMoveCount <= maxMove
 	  if(val >= max_prob and isValidMove):
 	    max_prob = val
-	    ans = j
-	return all_battle_won_moves[ans]
+	    ans = all_battle_won_moves[j]
+	return ans
 
 def predict_state_6(x_state):
 	test_likelihoods = model6.predict_proba([x_state])

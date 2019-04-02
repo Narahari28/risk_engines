@@ -108,8 +108,6 @@ def load_data():
           x_state_5.append(countries)
           #print("5 [" + ', '.join(str(c) for c in countries) + ']')
           observed_class = get_trailing_number(line) # Positive number
-          if observed_class not in all_battle_won_moves:
-            all_battle_won_moves.append(observed_class)
           y_state_5.append(observed_class)
         elif gameState == 6:
           x_state_6.append(countries)
@@ -149,7 +147,8 @@ def load_data():
         else:
           attack_defend_state.append(0)
     line = f.readline().strip()
-  all_battle_won_moves.sort()
+  for i in range(110):
+    all_battle_won_moves.append(i + 1)
   for i in range(len(y_state_2)):
     y_state_2[i] = all_placearmies.index(y_state_2[i])
   for i in range(len(y_state_5)):
@@ -242,7 +241,7 @@ def fit_model_and_test_state_5():
   y_pred = []
   for i in range(len(x_test)):
     row = test_likelihoods[i]
-    mustMove = row[-1]
+    mustMove = x_test[i][-1]
     max_prob = 0
     ans = -1
     countries, attack_defend_state = split_list(x_test[i][:-1])
@@ -256,7 +255,7 @@ def fit_model_and_test_state_5():
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 31.6%, much better than 1/74 (74 observed options in total)
+  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 26.5%, much better than 1/74 (74 observed options in total)
 
 
 # def fit_model_and_test_state_5_worse():
