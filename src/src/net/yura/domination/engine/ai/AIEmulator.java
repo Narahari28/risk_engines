@@ -66,7 +66,7 @@ public class AIEmulator implements AI {
 		}
 		x_state[x_state.length - 1] = game.getMustMove();
 		try {
-			ans = sendPost(5, x_state);
+			ans = sendPost(5, x_state, -1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -80,7 +80,7 @@ public class AIEmulator implements AI {
     		String ans = "";
 		int[] armies = getArmies();
 		try {
-			ans = sendPost(6, armies);
+			ans = sendPost(6, armies, -1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -130,7 +130,7 @@ public class AIEmulator implements AI {
     }
 
  // HTTP POST request
- 	private String sendPost(int gameState, int[] x_state) throws Exception {
+ 	private String sendPost(int gameState, int[] x_state, int offLimits) throws Exception {
  		String url = "http://localhost:5000/api";
  		URL obj = new URL(url);
  		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -145,6 +145,9 @@ public class AIEmulator implements AI {
  		JSONObject state = new JSONObject();
  		state.put("gameState", gameState);
  		state.put("x_state", x_state);
+ 		if(offLimits >= 0) {
+ 			state.put("offLimits", offLimits);
+ 		}
  		
  		OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
  		wr.write(state.toString());
@@ -193,8 +196,13 @@ public class AIEmulator implements AI {
 			x_state[i] = armies[i];
 		}
 		x_state[x_state.length - 1] = game.getCurrentPlayer().getExtraArmies();
+		int offLimits = 43;
+		String lastCommand = commands.get(commands.size() - 1);
+		if(lastCommand.contains("placearmies")) {
+			System.out.println(lastCommand);
+		}
 		try {
-			ans = sendPost(2, x_state);
+			ans = sendPost(2, x_state, offLimits);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -208,7 +216,7 @@ public class AIEmulator implements AI {
     		String ans = "";
 		int[] armies = getArmies();
 		try {
-			ans = sendPost(3, armies);
+			ans = sendPost(3, armies, -1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -238,7 +246,7 @@ public class AIEmulator implements AI {
     		}
     		String ans = "";
     		try {
-    			ans = sendPost(4, x_state);
+    			ans = sendPost(4, x_state, -1);
     		} catch (Exception e) {
     			e.printStackTrace();
     		}
@@ -284,7 +292,7 @@ public class AIEmulator implements AI {
 		}
 		String ans = "";
 		try {
-			ans = sendPost(10, x_state);
+			ans = sendPost(10, x_state, -1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

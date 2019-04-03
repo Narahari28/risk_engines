@@ -76,8 +76,6 @@ def load_data():
             total_count = old_count + new_count
             new_command = str(country) + " " + str(total_count)
             y_state_2[len(y_state_2) - 1] = new_command
-            if new_command not in all_placearmies:
-              all_placearmies.append(new_command)
           else:
             countries.append(100) # Say that max to place is 100
             x_state_2.append(countries)
@@ -120,8 +118,6 @@ def load_data():
           countries.append(mustMove)
           x_state_5.append(countries)
           observed_class = get_trailing_number(line) # Positive number
-          if observed_class not in all_battle_won_moves:
-            all_battle_won_moves.append(observed_class)
           y_state_5.append(observed_class)
         elif gameState == 6:
           x_state_6.append(countries)
@@ -129,8 +125,6 @@ def load_data():
             observed_class = "nomove"
           else:
             observed_class = " ".join(line.split()[-3:]) # Format "41 39 1"
-          if observed_class not in all_fortifying_moves:
-            all_fortifying_moves.append(observed_class)
           y_state_6.append(observed_class)
         elif gameState == 10:
           countries.append(countries[attack_defend_state.index(1)])
@@ -164,11 +158,6 @@ def load_data():
         else:
           attack_defend_state.append(0)
     line = f.readline().strip()
-  all_battle_won_moves.sort()
-  for i in range(len(y_state_5)):
-    y_state_5[i] = all_battle_won_moves.index(y_state_5[i])
-  for i in range(len(y_state_6)):
-    y_state_6[i] = all_fortifying_moves.index(y_state_6[i])
 
 def get_trailing_number(s):
   return int(s.split()[-1])
@@ -177,27 +166,29 @@ def get_trailing_country(s):
   return " ".join(s.split()[1:])
 
 def fit_model_state_2():
-  x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
+  all_placearmies = list(set(y_state_2))
+  for i in range(len(y_state_2)):
+    y_state_2[i] = all_placearmies.index(y_state_2[i])
   model = GaussianNB()
-  model.fit(x_train, y_train)
+  model.fit(x_state_2, y_state_2)
   pickle.dump(model, open('model2.pkl','wb'))
 
 def fit_model_state_3():
-  x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
   model = GaussianNB()
-  model.fit(x_train, y_train)
+  model.fit(x_state_3, y_state_3)
   pickle.dump(model, open('model3.pkl','wb'))
 
 def fit_model_state_4():
-  x_train, x_test, y_train, y_test = train_test_split(x_state_4, y_state_4, test_size=0.3,random_state=109)
   model = GaussianNB()
-  model.fit(x_train, y_train)
+  model.fit(x_state_4, y_state_4)
   pickle.dump(model, open('model4.pkl','wb'))
 
 def fit_model_state_5():
-  x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
+  all_battle_won_moves = list(set(y_state_5))
+  for i in range(len(y_state_5)):
+    y_state_5[i] = all_battle_won_moves.index(y_state_5[i])
   model = GaussianNB()
-  model.fit(x_train, y_train)
+  model.fit(x_state_5, y_state_5)
   pickle.dump(model, open('model5.pkl','wb'))
 
 # def fit_model_and_test_state_5_worse():
@@ -208,15 +199,16 @@ def fit_model_state_5():
 #   pickle.dump(model, open('model5worse.pkl','wb'))
 
 def fit_model_state_6():
-  x_train, x_test, y_train, y_test = train_test_split(x_state_6, y_state_6, test_size=0.3,random_state=109)
+  all_fortifying_moves = list(set(y_state_6))
+  for i in range(len(y_state_6)):
+    y_state_6[i] = all_fortifying_moves.index(y_state_6[i])
   model = GaussianNB()
-  model.fit(x_train, y_train)
+  model.fit(x_state_6, y_state_6)
   pickle.dump(model, open('model6.pkl','wb'))
 
 def fit_model_state_10():
-  x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
   model = GaussianNB()
-  model.fit(x_train, y_train)
+  model.fit(x_state_10, y_state_10)
   pickle.dump(model, open('model10.pkl','wb'))
 
 if __name__ == "__main__":

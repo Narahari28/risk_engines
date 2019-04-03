@@ -171,6 +171,13 @@ def predict_state_2(x_state, offLimits):
 		if(val >= max_prob and count <= maxPlace): # Better than previous best and is not opponent's country
 			max_prob = val
 			ans = all_placearmies[j]
+	if(ans == None):
+		validOptions = []
+		for i in range(42):
+			if((can_only_place_on_new and x_state[i] != 0) or x_state[i] < 0):
+				continue
+			validOptions.append(str(i + 1) + " 1")
+	print validOptions
 	return ans
 
 def predict_state_3(x_state):

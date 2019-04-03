@@ -75,15 +75,11 @@ def load_data():
             total_count = old_count + new_count
             new_command = str(country) + " " + str(total_count)
             y_state_2[len(y_state_2) - 1] = new_command
-            if new_command not in all_placearmies:
-              all_placearmies.append(new_command)
           else:
             countries.append(100) # Say that max to place is 100
             x_state_2.append(countries)
             # print("2 [" + ', '.join(str(c) for c in countries) + ']')
             observed_class = ' '.join((line.split()[-2:])) # e.g. "39 1"
-            if observed_class not in all_placearmies:
-              all_placearmies.append(observed_class)
             y_state_2.append(observed_class)
             previousPlaceCountry = country
         elif gameState == 3:
@@ -130,8 +126,6 @@ def load_data():
             observed_class = "nomove"
           else:
             observed_class = " ".join(line.split()[-3:]) # Format "41 39 1"
-          if observed_class not in all_fortifying_moves:
-            all_fortifying_moves.append(observed_class)
           y_state_6.append(observed_class)
         elif gameState == 10:
           countries.append(countries[attack_defend_state.index(1)])
@@ -166,14 +160,6 @@ def load_data():
         else:
           attack_defend_state.append(0)
     line = f.readline().strip()
-  for i in range(110):
-    all_battle_won_moves.append(i + 1)
-  for i in range(len(y_state_2)):
-    y_state_2[i] = all_placearmies.index(y_state_2[i])
-  for i in range(len(y_state_5)):
-    y_state_5[i] = all_battle_won_moves.index(y_state_5[i])
-  for i in range(len(y_state_6)):
-    y_state_6[i] = all_fortifying_moves.index(y_state_6[i])
 
 def get_trailing_number(s):
   return int(s.split()[-1])
@@ -187,6 +173,11 @@ def split_list(a_list):
 
 def fit_model_and_test_state_2():
   x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
+  all_placearmies = list(set(y_train))
+  for i in range(len(y_train)):
+    y_train[i] = all_placearmies.index(y_train[i])
+  for i in range(len(y_test)):
+    y_test[i] = all_placearmies.index(y_test[i]) if y_test[i] in all_placearmies else -1
   model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
@@ -209,7 +200,7 @@ def fit_model_and_test_state_2():
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~13.5%, much better than 1/674 (674 observed placearmies in total)
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~15.3%, much better than 1/838 (838 observed placearmies in total)
 
 def fit_model_and_test_state_3():
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
@@ -254,6 +245,11 @@ def fit_model_and_test_state_4():
 
 def fit_model_and_test_state_5():
   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
+  all_battle_won_moves = list(set(y_train))
+  for i in range(len(y_train)):
+    y_train[i] = all_battle_won_moves.index(y_train[i])
+  for i in range(len(y_test)):
+    y_test[i] = all_battle_won_moves.index(y_test[i]) if y_test[i] in all_battle_won_moves else -1
   model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
@@ -274,7 +270,7 @@ def fit_model_and_test_state_5():
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 26.5%, much better than 1/74 (74 observed options in total)
+  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 31.7%, much better than 1/64 (64 observed options in total)
 
 
 # def fit_model_and_test_state_5_worse():
@@ -305,6 +301,11 @@ def fit_model_and_test_state_5():
 
 def fit_model_and_test_state_6():
   x_train, x_test, y_train, y_test = train_test_split(x_state_6, y_state_6, test_size=0.3,random_state=109)
+  all_fortifying_moves = list(set(y_train))
+  for i in range(len(y_train)):
+    y_train[i] = all_fortifying_moves.index(y_train[i])
+  for i in range(len(y_test)):
+    y_test[i] = all_fortifying_moves.index(y_test[i]) if y_test[i] in all_fortifying_moves else -1
   model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
@@ -334,8 +335,8 @@ def fit_model_and_test_state_6():
     if actualMove != 'nomove' and suggestedMove != 'nomove' and int(suggestedMove.split()[0]) == int(actualMove.split()[0]) and int(suggestedMove.split()[1]) == int(actualMove.split()[1]):
       correct_pair_cnt += 1
     y_pred.append(ans)
-  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 17.3%, much better than 1/530 (530 observed options in total)
-  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 19.7%, much better than 1/164 (164 possible options in total)
+  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 17.2%, much better than 1/451 (451 observed options in total)
+  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 20.3%, much better than 1/164 (164 possible options in total)
 
 def fit_model_and_test_state_10():
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
