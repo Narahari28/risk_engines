@@ -76,7 +76,6 @@ def load_data():
             new_command = str(country) + " " + str(total_count)
             y_state_2[len(y_state_2) - 1] = new_command
           else:
-            countries.append(100) # Say that max to place is 100
             x_state_2.append(countries)
             # print("2 [" + ', '.join(str(c) for c in countries) + ']')
             observed_class = ' '.join((line.split()[-2:])) # e.g. "39 1"
@@ -184,15 +183,15 @@ def fit_model_and_test_state_2():
   y_pred = []
   for i in range(len(x_test)):
     row = test_likelihoods[i]
-    can_only_place_on_new = sum(x == 0 for x in x_test[i][:-1]) != 0
-    can_only_place_one = sum(abs(x) for x in x_test[i][:-1]) <= 80
+    can_only_place_on_new = sum(x == 0 for x in x_test[i]) != 0
+    can_only_place_one = sum(abs(x) for x in x_test[i]) <= 80
     max_prob = 0
     ans = -1
     for j in range(len(row)):
       potentialMove = all_placearmies[j]
       country = int(potentialMove.split()[0])
       count = int(potentialMove.split()[1])
-      maxPlace = x_test[i][-1]
+      maxPlace = 100 # Say max to place is 100
       val = row[j]
       if((can_only_place_one and count > 1) or (can_only_place_on_new and x_test[i][country - 1] != 0) or x_test[i][country - 1] < 0):
         continue

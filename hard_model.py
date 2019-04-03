@@ -77,7 +77,6 @@ def load_data():
             new_command = str(country) + " " + str(total_count)
             y_state_2[len(y_state_2) - 1] = new_command
           else:
-            countries.append(100) # Say that max to place is 100
             x_state_2.append(countries)
             # print("2 [" + ', '.join(str(c) for c in countries) + ']')
             observed_class = ' '.join((line.split()[-2:])) # e.g. "39 1"
