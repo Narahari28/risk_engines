@@ -2,6 +2,8 @@
 import numpy as np
 from flask import Flask, request, jsonify
 import pickle
+import random
+
 app = Flask(__name__)
 # Load the model
 model2 = pickle.load(open('model2.pkl','rb'))
@@ -177,7 +179,8 @@ def predict_state_2(x_state, offLimits):
 			if((can_only_place_on_new and x_state[i] != 0) or x_state[i] < 0):
 				continue
 			validOptions.append(str(i + 1) + " 1")
-	print validOptions
+	if(ans == None):
+		return random.choice(validOptions)
 	return ans
 
 def predict_state_3(x_state):
