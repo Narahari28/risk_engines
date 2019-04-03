@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -66,7 +67,7 @@ public class AIEmulator implements AI {
 		}
 		x_state[x_state.length - 1] = game.getMustMove();
 		try {
-			ans = sendPost(5, x_state, -1);
+			ans = sendPost(5, x_state, new Object[0]);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,8 +80,14 @@ public class AIEmulator implements AI {
     public String getTacMove() {
     		String ans = "";
 		int[] armies = getArmies();
+		ArrayList<Integer> banned = new ArrayList<Integer>();
+		for(int i = 0; i < armies.length; i++) {
+			if(armies[i] > 30) {
+				banned.add(i + 1);
+			}
+		}
 		try {
-			ans = sendPost(6, armies, -1);
+			ans = sendPost(6, armies, banned.toArray());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -130,7 +137,7 @@ public class AIEmulator implements AI {
     }
 
  // HTTP POST request
- 	private String sendPost(int gameState, int[] x_state, int offLimits) throws Exception {
+ 	private String sendPost(int gameState, int[] x_state, Object[] offLimits) throws Exception {
  		String url = "http://localhost:5000/api";
  		URL obj = new URL(url);
  		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -145,9 +152,7 @@ public class AIEmulator implements AI {
  		JSONObject state = new JSONObject();
  		state.put("gameState", gameState);
  		state.put("x_state", x_state);
- 		if(offLimits >= 0) {
- 			state.put("offLimits", offLimits);
- 		}
+		state.put("offLimits", offLimits);
  		
  		OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
  		wr.write(state.toString());
@@ -196,13 +201,19 @@ public class AIEmulator implements AI {
 			x_state[i] = armies[i];
 		}
 		x_state[x_state.length - 1] = game.getCurrentPlayer().getExtraArmies();
-		int offLimits = 43;
-		String lastCommand = commands.get(commands.size() - 1);
-		if(lastCommand.contains("placearmies")) {
-			System.out.println(lastCommand);
+		ArrayList<Integer> banned = new ArrayList<Integer>();
+		for(int i = commands.size() - 1; i >= 0; i--) {
+			String command = commands.get(i);
+			if(command.contains("placearmies")) {
+				String[] split = command.split(" ");
+				banned.add(Integer.parseInt(split[split.length - 2]));
+			} else break;
+		}
+		for(int i = 0; i < armies.length; i++) {
+			if(armies[i] > 30) banned.add(i + 1);
 		}
 		try {
-			ans = sendPost(2, x_state, offLimits);
+			ans = sendPost(2, x_state, banned.toArray());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -215,8 +226,12 @@ public class AIEmulator implements AI {
     public String getAttack() {
     		String ans = "";
 		int[] armies = getArmies();
+		ArrayList<String> offLimits = new ArrayList<String>();
+		if(!game.isCapturedCountry()) { // Space needed to avoid endattack case
+			offLimits.add("endattack");
+		}
 		try {
-			ans = sendPost(3, armies, -1);
+			ans = sendPost(3, armies, offLimits.toArray());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -246,7 +261,7 @@ public class AIEmulator implements AI {
     		}
     		String ans = "";
     		try {
-    			ans = sendPost(4, x_state, -1);
+    			ans = sendPost(4, x_state, new Object[0]);
     		} catch (Exception e) {
     			e.printStackTrace();
     		}
@@ -292,7 +307,7 @@ public class AIEmulator implements AI {
 		}
 		String ans = "";
 		try {
-			ans = sendPost(10, x_state, -1);
+			ans = sendPost(10, x_state, new Object[0]);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

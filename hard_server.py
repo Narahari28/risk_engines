@@ -144,13 +144,13 @@ def predict():
     if gameState == 2:
     	prediction = predict_state_2(data['x_state'], data['offLimits'])
     elif gameState == 3:
-    	prediction = predict_state_3(data['x_state'])
+    	prediction = predict_state_3(data['x_state'], data['offLimits'])
     elif gameState == 4:
     	prediction = predict_state_4(data['x_state'])
     elif gameState == 5:
     	prediction = predict_state_5(data['x_state'])
     elif gameState == 6:
-    	prediction = predict_state_6(data['x_state'])
+    	prediction = predict_state_6(data['x_state'], data['offLimits'])
     elif gameState == 10:
     	prediction = predict_state_10(data['x_state'])
     return jsonify(prediction)
@@ -162,17 +162,19 @@ def predict_state_2(x_state, offLimits):
 	row = test_likelihoods[0]
 	max_prob = 0
 	ans = None
+	print row
 	for j in range(len(row)):
 		potentialMove = all_placearmies[j]
 		country = int(potentialMove.split()[0])
 		count = int(potentialMove.split()[1])
 		maxPlace = x_state[-1]
 		val = row[j]
-		if(country == offLimits or (can_only_place_one and count > 1) or (can_only_place_on_new and x_state[country - 1] != 0) or x_state[country - 1] < 0):
+		if(country in offLimits or (can_only_place_one and count > 1) or (can_only_place_on_new and x_state[country - 1] != 0) or x_state[country - 1] < 0):
 			continue
 		if(val >= max_prob and count <= maxPlace): # Better than previous best and is not opponent's country
 			max_prob = val
 			ans = all_placearmies[j]
+	print ans, j, max_prob
 	if(ans == None):
 		validOptions = []
 		for i in range(42):
@@ -183,19 +185,21 @@ def predict_state_2(x_state, offLimits):
 		return random.choice(validOptions)
 	return ans
 
-def predict_state_3(x_state):
+def predict_state_3(x_state, offLimits):
 	test_likelihoods = model3.predict_proba([x_state])
 	row = test_likelihoods[0]
 	max_prob = 0
-	ans = -1
+	ans = None
 	for j in range(len(row)):
 	  val = row[j]
 	  attackPhrase = all_attacks[j]
 	  isValidAttack = attackPhrase == "endattack" or ((x_state[int(attackPhrase.split()[0]) - 1] > 1) and (x_state[int(attackPhrase.split()[1]) - 1] < 0))
-	  if(val >= max_prob and isValidAttack):
+	  if(val >= max_prob and isValidAttack and attackPhrase not in offLimits):
 	    max_prob = val
-	    ans = j
-	return all_attacks[ans]
+	    ans = attackPhrase
+	if ans == None:
+		return "endattack"
+	return ans
 
 def predict_state_4(x_state):
 	test_likelihoods = model4.predict_proba([x_state])
@@ -230,7 +234,7 @@ def predict_state_5(x_state):
 	    ans = all_battle_won_moves[j]
 	return ans
 
-def predict_state_6(x_state):
+def predict_state_6(x_state, offLimits):
 	test_likelihoods = model6.predict_proba([x_state])
 	row = test_likelihoods[0]
 	max_prob = 0
@@ -244,7 +248,7 @@ def predict_state_6(x_state):
 	    source = int(potentialMove.split()[0])
 	    destination = int(potentialMove.split()[1])
 	    armies = int(potentialMove.split()[2])
-	    isValidMove = x_state[source - 1] > armies and x_state[destination - 1] >= 0
+	    isValidMove = x_state[source - 1] > armies and x_state[destination - 1] >= 0 and destination not in offLimits
 	  if(val >= max_prob and isValidMove):
 	    max_prob = val
 	    ans = j
