@@ -36,6 +36,7 @@ public class AIDomination extends AISubmissive {
 	public static final int PLAYER_AI_AVERAGE = 4;
 	public final static int PLAYER_AI_HARD = 2;
 	public final static int PLAYER_AI_EASY = 1;
+	public final static int PLAYER_AI_EMULATOR = 6;
 
     protected final int type;
 	private boolean eliminating;
