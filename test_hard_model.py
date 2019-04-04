@@ -1,6 +1,7 @@
 from __future__ import division
 from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 
 # Note that we are ignoring game state = 1 because the bestTrade function is available
@@ -170,14 +171,18 @@ def split_list(a_list):
     half = len(a_list)//2
     return a_list[:half], a_list[half:]
 
-def fit_model_and_test_state_2():
+def fit_model_and_test_state_2(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
   all_placearmies = list(set(y_train))
   for i in range(len(y_train)):
     y_train[i] = all_placearmies.index(y_train[i])
   for i in range(len(y_test)):
     y_test[i] = all_placearmies.index(y_test[i]) if y_test[i] in all_placearmies else -1
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
@@ -201,9 +206,13 @@ def fit_model_and_test_state_2():
     y_pred.append(ans)
   print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~15.3%, much better than 1/838 (838 observed placearmies in total)
 
-def fit_model_and_test_state_3():
+def fit_model_and_test_state_3(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
@@ -221,9 +230,13 @@ def fit_model_and_test_state_3():
     y_pred.append(ans)
   print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~32.1%, much better than 1/20 (20 valid attacks on average)
 
-def fit_model_and_test_state_4():
+def fit_model_and_test_state_4(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_4, y_state_4, test_size=0.3,random_state=109)
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
@@ -242,14 +255,18 @@ def fit_model_and_test_state_4():
     y_pred.append(ans)
   print("State 4 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 67.3%, much better than 1/4 (4 options in general)
 
-def fit_model_and_test_state_5():
+def fit_model_and_test_state_5(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
   all_battle_won_moves = list(set(y_train))
   for i in range(len(y_train)):
     y_train[i] = all_battle_won_moves.index(y_train[i])
   for i in range(len(y_test)):
     y_test[i] = all_battle_won_moves.index(y_test[i]) if y_test[i] in all_battle_won_moves else -1
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
@@ -298,14 +315,18 @@ def fit_model_and_test_state_5():
 #     y_pred.append(ans)
 #   print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 19%
 
-def fit_model_and_test_state_6():
+def fit_model_and_test_state_6(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_6, y_state_6, test_size=0.3,random_state=109)
   all_fortifying_moves = list(set(y_train))
   for i in range(len(y_train)):
     y_train[i] = all_fortifying_moves.index(y_train[i])
   for i in range(len(y_test)):
     y_test[i] = all_fortifying_moves.index(y_test[i]) if y_test[i] in all_fortifying_moves else -1
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
@@ -337,9 +358,13 @@ def fit_model_and_test_state_6():
   print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 17.2%, much better than 1/451 (451 observed options in total)
   print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 20.3%, much better than 1/164 (164 possible options in total)
 
-def fit_model_and_test_state_10():
+def fit_model_and_test_state_10(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_train, y_train)
   test_likelihoods = model.predict_proba(x_test)
   y_pred = []
@@ -361,10 +386,10 @@ def fit_model_and_test_state_10():
 if __name__ == "__main__":
   read_attacks()
   load_data()
-  fit_model_and_test_state_2()
-  fit_model_and_test_state_3()
-  fit_model_and_test_state_4()
-  fit_model_and_test_state_5()
+  fit_model_and_test_state_2("forest")
+  fit_model_and_test_state_3("forest")
+  fit_model_and_test_state_4("forest")
+  fit_model_and_test_state_5("forest")
   # fit_model_and_test_state_5_worse()
-  fit_model_and_test_state_6()
-  fit_model_and_test_state_10()
+  fit_model_and_test_state_6("forest")
+  fit_model_and_test_state_10("forest")
