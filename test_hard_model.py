@@ -204,7 +204,7 @@ def fit_model_and_test_state_2(type):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~15.3%, much better than 1/838 (838 observed placearmies in total)
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 15.3%, RF: 39.7% much better than 1/838 (838 observed placearmies in total)
 
 def fit_model_and_test_state_3(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
@@ -228,7 +228,7 @@ def fit_model_and_test_state_3(type):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets ~32.1%, much better than 1/20 (20 valid attacks on average)
+  print("State 3 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 32.1%, RF: 35.2% much better than 1/20 (20 valid attacks on average)
 
 def fit_model_and_test_state_4(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_4, y_state_4, test_size=0.3,random_state=109)
@@ -253,7 +253,7 @@ def fit_model_and_test_state_4(type):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 4 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 67.3%, much better than 1/4 (4 options in general)
+  print("State 4 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 67.3%, RF: 96.2% much better than 1/4 (4 options in general)
 
 def fit_model_and_test_state_5(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
@@ -286,7 +286,7 @@ def fit_model_and_test_state_5(type):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 31.7%, much better than 1/64 (64 observed options in total)
+  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 31.7%, RF: 31.6% much better than 1/64 (64 observed options in total)
 
 
 # def fit_model_and_test_state_5_worse():
@@ -350,13 +350,11 @@ def fit_model_and_test_state_6(type):
         ans = j
     actualMove = all_fortifying_moves[y_test[i]]
     suggestedMove = all_fortifying_moves[ans]
-    if actualMove == 'nomove' and suggestedMove == 'nomove':
-      correct_pair_cnt += 1
-    if actualMove != 'nomove' and suggestedMove != 'nomove' and int(suggestedMove.split()[0]) == int(actualMove.split()[0]) and int(suggestedMove.split()[1]) == int(actualMove.split()[1]):
+    if actualMove == suggestedMove:
       correct_pair_cnt += 1
     y_pred.append(ans)
-  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 17.2%, much better than 1/451 (451 observed options in total)
-  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # Gets 20.3%, much better than 1/164 (164 possible options in total)
+  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 17.2%, RF: 24.3% much better than 1/451 (451 observed options in total)
+  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # NB: 20.3%, RF: 26.9% much better than 1/164 (164 possible options in total)
 
 def fit_model_and_test_state_10(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
@@ -381,15 +379,15 @@ def fit_model_and_test_state_10(type):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 10 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 100%, much better than 1/2 (2 options in general)
+  print("State 10 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 100%, RF: 100% much better than 1/2 (2 options in general)
 
 if __name__ == "__main__":
   read_attacks()
   load_data()
-  fit_model_and_test_state_2("forest")
-  fit_model_and_test_state_3("forest")
-  fit_model_and_test_state_4("forest")
-  fit_model_and_test_state_5("forest")
+  # fit_model_and_test_state_2("forest")
+  # fit_model_and_test_state_3("forest")
+  # fit_model_and_test_state_4("forest")
+  # fit_model_and_test_state_5("forest")
   # fit_model_and_test_state_5_worse()
   fit_model_and_test_state_6("forest")
-  fit_model_and_test_state_10("forest")
+  # fit_model_and_test_state_10("forest")

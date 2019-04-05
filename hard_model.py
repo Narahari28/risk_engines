@@ -1,8 +1,9 @@
 from __future__ import division
 from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
-import pickle
+from sklearn.externals import joblib
 
 # Note that we are ignoring game state = 1 because the bestTrade function is available
 x_state_2 = [] # Place armies
@@ -164,31 +165,47 @@ def get_trailing_number(s):
 def get_trailing_country(s):
   return " ".join(s.split()[1:])
 
-def fit_model_state_2():
+def fit_model_state_2(type):
   all_placearmies = list(set(y_state_2))
   for i in range(len(y_state_2)):
     y_state_2[i] = all_placearmies.index(y_state_2[i])
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_state_2, y_state_2)
-  pickle.dump(model, open('model2.pkl','wb'))
+  joblib.dump(model, 'model2.pkl', compress=0)
 
-def fit_model_state_3():
-  model = GaussianNB()
+def fit_model_state_3(type):
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_state_3, y_state_3)
-  pickle.dump(model, open('model3.pkl','wb'))
+  joblib.dump(model, 'model3.pkl', compress=0)
 
-def fit_model_state_4():
-  model = GaussianNB()
+def fit_model_state_4(type):
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_state_4, y_state_4)
-  pickle.dump(model, open('model4.pkl','wb'))
+  joblib.dump(model, 'model4.pkl', compress=0)
 
-def fit_model_state_5():
+def fit_model_state_5(type):
   all_battle_won_moves = list(set(y_state_5))
   for i in range(len(y_state_5)):
     y_state_5[i] = all_battle_won_moves.index(y_state_5[i])
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_state_5, y_state_5)
-  pickle.dump(model, open('model5.pkl','wb'))
+  joblib.dump(model, 'model5.pkl', compress=0)
 
 # def fit_model_and_test_state_5_worse():
 #   print all_battle_won_moves
@@ -197,26 +214,34 @@ def fit_model_state_5():
 #   model.fit(x_train, y_train)
 #   pickle.dump(model, open('model5worse.pkl','wb'))
 
-def fit_model_state_6():
+def fit_model_state_6(type):
   all_fortifying_moves = list(set(y_state_6))
   for i in range(len(y_state_6)):
     y_state_6[i] = all_fortifying_moves.index(y_state_6[i])
-  model = GaussianNB()
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_state_6, y_state_6)
-  pickle.dump(model, open('model6.pkl','wb'))
+  joblib.dump(model, 'model6.pkl', compress=0)
 
-def fit_model_state_10():
-  model = GaussianNB()
+def fit_model_state_10(type):
+  model = None
+  if(type == "forest"):
+    model = RandomForestClassifier(n_estimators=100)
+  else:
+    model = GaussianNB()
   model.fit(x_state_10, y_state_10)
-  pickle.dump(model, open('model10.pkl','wb'))
+  joblib.dump(model, 'model10.pkl', compress=0)
 
 if __name__ == "__main__":
   read_attacks()
   load_data()
-  fit_model_state_2()
-  fit_model_state_3()
-  fit_model_state_4()
-  fit_model_state_5()
+  fit_model_state_2("forest")
+  fit_model_state_3("forest")
+  fit_model_state_4("forest")
+  fit_model_state_5("forest")
   # fit_model_and_test_state_5_worse()
-  fit_model_state_6()
-  fit_model_state_10()
+  fit_model_state_6("forest")
+  fit_model_state_10("forest")

@@ -1,17 +1,17 @@
 # Import libraries
 import numpy as np
 from flask import Flask, request, jsonify
-import pickle
+from sklearn.externals import joblib
 import random
 
 app = Flask(__name__)
 # Load the model
-model2 = pickle.load(open('model2.pkl','rb'))
-model3 = pickle.load(open('model3.pkl','rb'))
-model4 = pickle.load(open('model4.pkl','rb'))
-model5 = pickle.load(open('model5.pkl','rb'))
-model6 = pickle.load(open('model6.pkl','rb'))
-model10 = pickle.load(open('model10.pkl','rb'))
+model2 = joblib.load('model2.pkl', mmap_mode='r')
+model3 = joblib.load('model3.pkl', mmap_mode='r')
+model4 = joblib.load('model4.pkl', mmap_mode='r')
+model5 = joblib.load('model5.pkl', mmap_mode='r')
+model6 = joblib.load('model6.pkl', mmap_mode='r')
+model10 = joblib.load('model10.pkl', mmap_mode='r')
 
 all_attacks = []
 all_fortifying_moves = []

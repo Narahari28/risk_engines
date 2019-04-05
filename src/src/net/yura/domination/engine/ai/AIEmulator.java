@@ -47,36 +47,36 @@ public class AIEmulator implements AI {
     protected Player player;
     private final AI domination = new AIDominationCopy(AIDominationCopy.PLAYER_AI_EMULATOR);
 
-//    public String getBattleWon() {
-//    		String ans = "";
-//		int[] armies = getArmies();
-//		Country[] countries = game.getCountries();
-//		Country attacker = game.getAttacker();
-//		Country defender = game.getDefender();
-//		int[] x_state = new int[armies.length + countries.length + 1];
-//		for(int i = 0; i < armies.length; i++) {
-//			x_state[i] = armies[i];
-//		}
-//		for(int i = 0; i < countries.length; i++) {
-//			if(countries[i] == attacker) {
-//				x_state[i + armies.length] = 1;
-//			} else if(countries[i] == defender) {
-//				x_state[i + armies.length] = -1;
-//			} else {
-//				x_state[i + armies.length] = 0;
-//			}
-//		}
-//		x_state[x_state.length - 1] = game.getMustMove();
-//		try {
-//			ans = sendPost(5, x_state, new Object[0], -1);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		if(ans.contains("\"")) {
-//			ans = ans.substring(1, ans.length() - 1);
-//		}
-//		return "move " + ans;
-//    }
+    public String getBattleWon() {
+    		String ans = "";
+		int[] armies = getArmies();
+		Country[] countries = game.getCountries();
+		Country attacker = game.getAttacker();
+		Country defender = game.getDefender();
+		int[] x_state = new int[armies.length + countries.length + 1];
+		for(int i = 0; i < armies.length; i++) {
+			x_state[i] = armies[i];
+		}
+		for(int i = 0; i < countries.length; i++) {
+			if(countries[i] == attacker) {
+				x_state[i + armies.length] = 1;
+			} else if(countries[i] == defender) {
+				x_state[i + armies.length] = -1;
+			} else {
+				x_state[i + armies.length] = 0;
+			}
+		}
+		x_state[x_state.length - 1] = game.getMustMove();
+		try {
+			ans = sendPost(5, x_state, new Object[0], -1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
+		return "move " + ans;
+    }
 
 //    public String getTacMove() {
 //    		String ans = "";
@@ -100,7 +100,7 @@ public class AIEmulator implements AI {
 //		}
 //		return "movearmies " + ans;
 //    }
-//
+
     public String getTrade() {
 
             List<Card> cards = player.getCards();
@@ -195,7 +195,7 @@ public class AIEmulator implements AI {
 		}
 		return armies;
  	}
-//
+
 //    public String getPlaceArmies() {
 //    		Vector<String> commands = game.getCommands();
 //		String ans = "";
@@ -222,24 +222,24 @@ public class AIEmulator implements AI {
 //		return "placearmies " + ans;
 //    }
 //
-//    public String getAttack() {
-//    		String ans = "";
-//		int[] armies = getArmies();
-//		ArrayList<String> offLimits = new ArrayList<String>();
-//		if(!game.isCapturedCountry()) { // Space needed to avoid endattack case
-//			offLimits.add("endattack");
-//		}
-//		try {
-//			ans = sendPost(3, armies, offLimits.toArray(), -1);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		if(ans.contains("\"")) {
-//			ans = ans.substring(1, ans.length() - 1);
-//		}
-//		if(ans.equals("endattack")) return ans;
-//		return "attack " + ans;
-//    }
+    public String getAttack() {
+    		String ans = "";
+		int[] armies = getArmies();
+		ArrayList<String> offLimits = new ArrayList<String>();
+		if(!game.isCapturedCountry()) { // Space needed to avoid endattack case
+			offLimits.add("endattack");
+		}
+		try {
+			ans = sendPost(3, armies, offLimits.toArray(), -1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
+		if(ans.equals("endattack")) return ans;
+		return "attack " + ans;
+    }
 
     public String getRoll() {
     		Vector<String> commands = game.getCommands();
@@ -324,15 +324,7 @@ public class AIEmulator implements AI {
 		return domination.getPlaceArmies();
 	}
 
-	public String getAttack() {
-		return domination.getAttack();
-	}
-	
-	public String getBattleWon() {
-		return domination.getBattleWon();
-	}
-	
-//	public String getRoll() {
-//		return domination.getRoll();
+//	public String getAttack() {
+//		return domination.getAttack();
 //	}
 }

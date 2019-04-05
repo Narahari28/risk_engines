@@ -188,7 +188,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 		cardState=0;
 
 		replayCommands = new Vector();
-		printNewGameNewLine("easy_vs_emulator.txt");
+		printNewGameNewLine("new_attack.txt");
 
 		//System.out.print("New Game created\n"); // testing
 
@@ -1473,7 +1473,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 		if (result==true) {
 			gameState=STATE_GAME_OVER;
 			try {
-				printGameWonBy(this.currentPlayer, "easy_vs_emulator.txt");
+				printGameWonBy(this.currentPlayer, "new_attack.txt");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
