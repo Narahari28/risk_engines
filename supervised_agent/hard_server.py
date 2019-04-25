@@ -41,12 +41,13 @@ def load_data():
   attack_defend_state = [] # All zeroes, except attacker and defender
   attacker = None
   defender = None
-  previousTurnWasPlace = False
-  previousPlaceCountry = None
 
   while line:
     if line == "Current player: Hard":
       currentlyTracking = True
+    elif line == "Current player: Easy":
+      previousTurnWasPlace = False
+      currentlyTracking = False
     if currentlyTracking:
       if "Game state:" in line:
         gameState = get_trailing_number(line)
@@ -64,21 +65,10 @@ def load_data():
           pass
         elif gameState == 2:
           country = int(line.split()[-2])
-          if previousTurnWasPlace and previousPlaceCountry == country:
-            old_command = y_state_2[len(y_state_2) - 1]
-            old_count = int(old_command.split()[-1])
-            new_count = int(line.split()[-1])
-            total_count = old_count + new_count
-            new_command = str(country) + " " + str(total_count)
-            y_state_2[len(y_state_2) - 1] = new_command
-            if new_command not in all_placearmies:
-              all_placearmies.append(new_command)
-          else:
-            observed_class = ' '.join((line.split()[-2:])) # e.g. "39 1"
-            if observed_class not in all_placearmies:
-              all_placearmies.append(observed_class)
-            y_state_2.append(observed_class)
-            previousPlaceCountry = country
+          count = int(line.split()[-1])
+          while(count > 0):
+            y_state_2.append(str(country) + ' 1')
+            count -= 1
         elif gameState == 3:
           pass
         elif gameState == 4:
@@ -156,31 +146,32 @@ def predict():
     return jsonify(prediction)
 
 def predict_state_2(x_state, offLimits, maxArmies):
-	test_likelihoods = model2.predict_proba([x_state])
-	can_only_place_on_new = sum(x == 0 for x in x_state) != 0
-	can_only_place_one = sum(abs(x) for x in x_state) <= 80
-	row = test_likelihoods[0]
-	max_prob = 0
-	ans = None
-	for j in range(len(row)):
-		potentialMove = all_placearmies[j]
-		country = int(potentialMove.split()[0])
-		count = int(potentialMove.split()[1])
-		val = row[j]
-		if(country in offLimits or (can_only_place_one and count > 1) or (can_only_place_on_new and x_state[country - 1] != 0) or x_state[country - 1] < 0):
-			continue
-		if(val >= max_prob and count <= maxArmies): # Better than previous best and is not opponent's country
-			max_prob = val
-			ans = all_placearmies[j]
-	if(ans == None):
-		validOptions = []
-		for i in range(42):
-			if((can_only_place_on_new and x_state[i] != 0) or x_state[i] < 0):
-				continue
-			validOptions.append(str(i + 1) + " 1")
-	if(ans == None):
-		return random.choice(validOptions)
-	return ans
+  all_placearmies = list(set(y_state_2))
+  test_likelihoods = model2.predict_proba([x_state])
+  can_only_place_on_new = sum(x == 0 for x in x_state) != 0
+  can_only_place_one = sum(abs(x) for x in x_state) <= 80
+  row = test_likelihoods[0]
+  max_prob = 0
+  ans = None
+  for j in range(len(row)):
+  	potentialMove = all_placearmies[j]
+  	country = int(potentialMove.split()[0])
+  	count = int(potentialMove.split()[1])
+  	val = row[j]
+  	if(country in offLimits or (can_only_place_one and count > 1) or (can_only_place_on_new and x_state[country - 1] != 0) or x_state[country - 1] < 0):
+  		continue
+  	if(val >= max_prob and count <= maxArmies): # Better than previous best and is not opponent's country
+  		max_prob = val
+  		ans = all_placearmies[j]
+  if(ans == None):
+  	validOptions = []
+  	for i in range(42):
+  		if((can_only_place_on_new and x_state[i] != 0) or x_state[i] < 0):
+  			continue
+  		validOptions.append(str(i + 1) + " 1")
+  if(ans == None):
+  	return random.choice(validOptions)
+  return ans
 
 def predict_state_3(x_state, offLimits):
 	test_likelihoods = model3.predict_proba([x_state])

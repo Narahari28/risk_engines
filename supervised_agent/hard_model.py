@@ -4,6 +4,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 from sklearn.externals import joblib
+import copy
 
 # Note that we are ignoring game state = 1 because the bestTrade function is available
 x_state_2 = [] # Place armies
@@ -47,12 +48,12 @@ def load_data():
   attack_defend_state = [] # All zeroes, except attacker and defender
   attacker = None
   defender = None
-  previousTurnWasPlace = False
-  previousPlaceCountry = None
 
   while line:
     if line == "Current player: Hard":
       currentlyTracking = True
+    elif line == "Current player: Easy":
+      currentlyTracking = False
     if currentlyTracking:
       if "Game state:" in line:
         gameState = get_trailing_number(line)
@@ -70,23 +71,14 @@ def load_data():
           pass
         elif gameState == 2:
           country = int(line.split()[-2])
-          if previousTurnWasPlace and previousPlaceCountry == country:
-            old_command = y_state_2[len(y_state_2) - 1]
-            old_count = int(old_command.split()[-1])
-            new_count = int(line.split()[-1])
-            total_count = old_count + new_count
-            new_command = str(country) + " " + str(total_count)
-            y_state_2[len(y_state_2) - 1] = new_command
-          else:
-            x_state_2.append(countries)
-            # print("2 [" + ', '.join(str(c) for c in countries) + ']')
-            observed_class = ' '.join((line.split()[-2:])) # e.g. "39 1"
-            if observed_class not in all_placearmies:
-              all_placearmies.append(observed_class)
-            y_state_2.append(observed_class)
-            previousPlaceCountry = country
+          count = int(line.split()[-1])
+          while(count > 0):
+            x_state_2.append(copy.deepcopy(countries))
+            y_state_2.append(str(country) + ' 1')
+            countries[country - 1] += 1
+            count -= 1
         elif gameState == 3:
-          x_state_3.append(countries)
+          x_state_3.append(copy.deepcopy(countries))
           if "endattack" in line:
             attack_phrase = "endattack"
           else:
@@ -96,7 +88,7 @@ def load_data():
         elif gameState == 4:
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
-          x_state_4.append(countries)
+          x_state_4.append(copy.deepcopy(countries))
           if "retreat" in line:
             roll_phrase = "retreat"
           else:
@@ -116,11 +108,11 @@ def load_data():
           # y_state_5.append(observed_class)
           countries.extend(attack_defend_state)
           countries.append(mustMove)
-          x_state_5.append(countries)
+          x_state_5.append(copy.deepcopy(countries))
           observed_class = get_trailing_number(line) # Positive number
           y_state_5.append(observed_class)
         elif gameState == 6:
-          x_state_6.append(countries)
+          x_state_6.append(copy.deepcopy(countries))
           if "nomove" in line:
             observed_class = "nomove"
           else:
@@ -129,15 +121,10 @@ def load_data():
         elif gameState == 10:
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
-          x_state_10.append(countries)
+          x_state_10.append(copy.deepcopy(countries))
           roll_phrase = get_trailing_number(line)
           observed_class = all_rolls_defender.index(roll_phrase)
           y_state_10.append(observed_class) # Encoding not so important on this case since basically always roll as much as possible
-        if gameState == 2:
-          previousTurnWasPlace = True
-        else:
-          previousTurnWasPlace = False
-          previousPlaceCountry = None
         currentlyTracking = False  # So we don't hit this case on the 2nd set of "--" after output line
         readingCountries = False
         gameState = -1

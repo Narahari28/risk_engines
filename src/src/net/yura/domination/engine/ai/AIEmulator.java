@@ -78,28 +78,28 @@ public class AIEmulator implements AI {
 		return "move " + ans;
     }
 
-//    public String getTacMove() {
-//    		String ans = "";
-//		int[] armies = getArmies();
-//		ArrayList<Integer> banned = new ArrayList<Integer>();
-//		for(int i = 0; i < armies.length; i++) {
-//			if(armies[i] > 30) {
-//				banned.add(i + 1);
-//			}
-//		}
-//		try {
-//			ans = sendPost(6, armies, banned.toArray(), -1);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		if(ans.contains("\"")) {
-//			ans = ans.substring(1, ans.length() - 1);
-//		}
-//		if(ans.equals("nomove")) {
-//			return ans;
-//		}
-//		return "movearmies " + ans;
-//    }
+    public String getTacMove() {
+    		String ans = "";
+		int[] armies = getArmies();
+		ArrayList<Integer> banned = new ArrayList<Integer>();
+		for(int i = 0; i < armies.length; i++) {
+			if(armies[i] > 30) {
+				banned.add(i + 1);
+			}
+		}
+		try {
+			ans = sendPost(6, armies, banned.toArray(), -1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
+		if(ans.equals("nomove")) {
+			return ans;
+		}
+		return "movearmies " + ans;
+    }
 
     public String getTrade() {
 
@@ -196,11 +196,16 @@ public class AIEmulator implements AI {
 		return armies;
  	}
 
-//    public String getPlaceArmies() {
-//    		Vector<String> commands = game.getCommands();
-//		String ans = "";
-//		int[] armies = getArmies();
-//		ArrayList<Integer> banned = new ArrayList<Integer>();
+    public String getPlaceArmies() {
+    		Vector<String> commands = game.getCommands();
+		String ans = "";
+		int[] armies = getArmies();
+		ArrayList<Integer> banned = new ArrayList<Integer>();
+		String command = commands.get(commands.size()- 1);
+		if(command.contains("placearmies")) {
+			String[] split = command.split(" ");
+			banned.add(Integer.parseInt(split[split.length - 2]));
+		}
 //		for(int i = commands.size() - 1; i >= 0; i--) {
 //			String command = commands.get(i);
 //			if(command.contains("placearmies")) {
@@ -208,20 +213,20 @@ public class AIEmulator implements AI {
 //				banned.add(Integer.parseInt(split[split.length - 2]));
 //			} else break;
 //		}
-//		for(int i = 0; i < armies.length; i++) {
-//			if(armies[i] > 30) banned.add(i + 1);
-//		}
-//		try {
-//			ans = sendPost(2, armies, banned.toArray(), game.getCurrentPlayer().getExtraArmies());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		if(ans.contains("\"")) {
-//			ans = ans.substring(1, ans.length() - 1);
-//		}
-//		return "placearmies " + ans;
-//    }
-//
+		for(int i = 0; i < armies.length; i++) {
+			if(armies[i] > 30) banned.add(i + 1);
+		}
+		try {
+			ans = sendPost(2, armies, banned.toArray(), game.getCurrentPlayer().getExtraArmies());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(ans.contains("\"")) {
+			ans = ans.substring(1, ans.length() - 1);
+		}
+		return "placearmies " + ans;
+    }
+
     public String getAttack() {
     		String ans = "";
 		int[] armies = getArmies();
@@ -316,13 +321,13 @@ public class AIEmulator implements AI {
 		return "roll " + ans;
     }
 
-	public String getTacMove() {
-		return domination.getTacMove();
-	}
-
-	public String getPlaceArmies() {
-		return domination.getPlaceArmies();
-	}
+//	public String getTacMove() {
+//		return domination.getTacMove();
+//	}
+//
+//	public String getPlaceArmies() {
+//		return domination.getPlaceArmies();
+//	}
 
 //	public String getAttack() {
 //		return domination.getAttack();

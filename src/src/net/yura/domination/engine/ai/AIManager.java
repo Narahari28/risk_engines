@@ -63,7 +63,7 @@ public class AIManager {
             }
 
             usethisAI.setGame(game);
-            game.printGameState("new_attack.txt");
+            game.printGameState("hard_vs_emulator.txt");
 
             String output=null;
 
@@ -83,7 +83,7 @@ public class AIManager {
             }
 
             if (output==null) { throw new NullPointerException("AI ERROR!"); }
-            game.printOutput(output, "new_attack.txt");
+            game.printOutput(output, "hard_vs_emulator.txt");
             return output;
     }
 

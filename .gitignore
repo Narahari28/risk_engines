@@ -1,5 +1,4 @@
-game_state.txt
-*.pkl
 saves/*
-easy_vs_emulator.txt
-easy_vs_hard.txt
+supervised_agent/*.txt
+supervised_agent/*.pkl
+reinforcement_agent/*.txt

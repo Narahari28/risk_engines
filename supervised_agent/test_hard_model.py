@@ -3,6 +3,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
+import copy
 
 # Note that we are ignoring game state = 1 because the bestTrade function is available
 x_state_2 = [] # Place armies
@@ -46,12 +47,19 @@ def load_data():
   attack_defend_state = [] # All zeroes, except attacker and defender
   attacker = None
   defender = None
-  previousTurnWasPlace = False
-  previousPlaceCountry = None;
 
   while line:
     if line == "Current player: Hard":
       currentlyTracking = True
+    elif line == "Current player: Easy":
+      currentlyTracking = False
+      readingCountries = False
+      gameState = -1
+      mustMove = 0
+      countries = []
+      attack_defend_state = []
+      attacker = None
+      defender = None
     if currentlyTracking:
       if "Game state:" in line:
         gameState = get_trailing_number(line)
@@ -69,21 +77,14 @@ def load_data():
           pass
         elif gameState == 2:
           country = int(line.split()[-2])
-          if previousTurnWasPlace and previousPlaceCountry == country:
-            old_command = y_state_2[len(y_state_2) - 1]
-            old_count = int(old_command.split()[-1])
-            new_count = int(line.split()[-1])
-            total_count = old_count + new_count
-            new_command = str(country) + " " + str(total_count)
-            y_state_2[len(y_state_2) - 1] = new_command
-          else:
-            x_state_2.append(countries)
-            # print("2 [" + ', '.join(str(c) for c in countries) + ']')
-            observed_class = ' '.join((line.split()[-2:])) # e.g. "39 1"
-            y_state_2.append(observed_class)
-            previousPlaceCountry = country
+          count = int(line.split()[-1])
+          while(count > 0):
+            x_state_2.append(copy.deepcopy(countries))
+            y_state_2.append(str(country) + ' 1')
+            countries[country - 1] += 1
+            count -= 1
         elif gameState == 3:
-          x_state_3.append(countries)
+          x_state_3.append(copy.deepcopy(countries))
           #print("3 [" + ', '.join(str(c) for c in countries) + ']')
           if "endattack" in line:
             attack_phrase = "endattack"
@@ -94,7 +95,7 @@ def load_data():
         elif gameState == 4:
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
-          x_state_4.append(countries)
+          x_state_4.append(copy.deepcopy(countries))
           #print("4 [" + ', '.join(str(c) for c in countries) + ']')
           if "retreat" in line:
             roll_phrase = "retreat"
@@ -115,12 +116,12 @@ def load_data():
           # y_state_5.append(observed_class)
           countries.extend(attack_defend_state)
           countries.append(mustMove)
-          x_state_5.append(countries)
+          x_state_5.append(copy.deepcopy(countries))
           #print("5 [" + ', '.join(str(c) for c in countries) + ']')
           observed_class = get_trailing_number(line) # Positive number
           y_state_5.append(observed_class)
         elif gameState == 6:
-          x_state_6.append(countries)
+          x_state_6.append(copy.deepcopy(countries))
           #print("6 [" + ', '.join(str(c) for c in countries) + ']')
           if "nomove" in line:
             observed_class = "nomove"
@@ -130,16 +131,11 @@ def load_data():
         elif gameState == 10:
           countries.append(countries[attack_defend_state.index(1)])
           countries.append(countries[attack_defend_state.index(-1)])
-          x_state_10.append(countries)
+          x_state_10.append(copy.deepcopy(countries))
           # print("10 [" + ', '.join(str(c) for c in countries) + ']')
           roll_phrase = get_trailing_number(line)
           observed_class = all_rolls_defender.index(roll_phrase)
-          y_state_10.append(observed_class) # Encoding not so important on this case since basically always roll as much as possible 
-        if gameState == 2:
-          previousTurnWasPlace = True
-        else:
-          previousTurnWasPlace = False
-          previousPlaceCountry = None
+          y_state_10.append(observed_class) # Encoding not so important on this case since basically always roll as much as possible
         currentlyTracking = False  # So we don't hit this case on the 2nd set of "--" after output line
         readingCountries = False
         gameState = -1
@@ -204,7 +200,10 @@ def fit_model_and_test_state_2(type):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 15.3%, RF: 39.7% much better than 1/838 (838 observed placearmies in total)
+  print("State 2 Accuracy:", metrics.accuracy_score(y_test, y_pred))
+  # When all placearmies grouped together: NB: 20.7%, RF: 53.6% much better than 1/838 (838 observed placearmies in total)
+  # When placearmies split up: NB: 35.5%, RF: 87.5%
+  # RF (initial phase): 85%, Later phase: 89%. Splitting up these into 2 separate datasets doesn't help.
 
 def fit_model_and_test_state_3(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_3, y_state_3, test_size=0.3,random_state=109)
@@ -286,7 +285,7 @@ def fit_model_and_test_state_5(type):
         max_prob = val
         ans = j
     y_pred.append(ans)
-  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 31.7%, RF: 31.6% much better than 1/64 (64 observed options in total)
+  print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 31.7%, RF: 31.9% much better than 1/64 (64 observed options in total)
 
 
 # def fit_model_and_test_state_5_worse():
@@ -353,8 +352,8 @@ def fit_model_and_test_state_6(type):
     if actualMove == suggestedMove:
       correct_pair_cnt += 1
     y_pred.append(ans)
-  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 17.2%, RF: 24.3% much better than 1/451 (451 observed options in total)
-  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # NB: 20.3%, RF: 26.9% much better than 1/164 (164 possible options in total)
+  print("State 6 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 17.2%, RF: 25.3% much better than 1/451 (451 observed options in total)
+  print("State 6 Destination Source Accuracy:", correct_pair_cnt/len(x_test)) # NB: 17.2%, RF: 25.3% much better than 1/164 (164 possible options in total)
 
 def fit_model_and_test_state_10(type):
   x_train, x_test, y_train, y_test = train_test_split(x_state_10, y_state_10, test_size=0.3,random_state=109)
@@ -384,10 +383,9 @@ def fit_model_and_test_state_10(type):
 if __name__ == "__main__":
   read_attacks()
   load_data()
-  # fit_model_and_test_state_2("forest")
+  fit_model_and_test_state_2("forest")
   # fit_model_and_test_state_3("forest")
   # fit_model_and_test_state_4("forest")
   # fit_model_and_test_state_5("forest")
-  # fit_model_and_test_state_5_worse()
-  fit_model_and_test_state_6("forest")
+  # fit_model_and_test_state_6("forest")
   # fit_model_and_test_state_10("forest")
