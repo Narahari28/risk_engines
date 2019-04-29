@@ -47,9 +47,19 @@ class Arena():
 
             valids = self.game.getValidMoves(self.game.getCanonicalForm(board, curPlayer),1)
 
-            if valids[action]==0:
+            all_moves = []
+            f = open("all_moves.txt", "r")
+            line = f.readline().strip()
+            while line:
+                all_moves.append(line)
+                line = f.readline().strip()
+            print("Turn ", str(it), "Player ", str(curPlayer))
+            print("Board ", board)
+
+            while valids[action]==0:
                 print(action)
-                assert valids[action] >0
+                print(all_moves[action])
+                action = players[curPlayer+1](self.game.getCanonicalForm(board, curPlayer))
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
             assert(self.display)

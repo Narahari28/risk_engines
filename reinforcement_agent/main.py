@@ -1,19 +1,22 @@
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.pytorch.NNet import NNetWrapper as nn
+from risk.RiskGame import RiskGame as Game
+from risk.pytorch.NNet import NNetWrapper as nn
+from othello.OthelloGame import OthelloGame as Game2
+from othello.pytorch.NNet import NNetWrapper as nn2
 from utils import *
+import numpy as np
 
 args = dotdict({
-    'numIters': 1000,
+    'numIters': 50,
     'numEps': 100,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 25,
+    'numMCTSSims': 10,
     'arenaCompare': 40,
     'cpuct': 1,
 
-    'checkpoint': './temp/',
+    'checkpoint': './temp_100eps_controlled',
     'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
@@ -21,7 +24,7 @@ args = dotdict({
 })
 
 if __name__=="__main__":
-    g = Game(6)
+    g = Game()
     nnet = nn(g)
 
     if args.load_model:

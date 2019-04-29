@@ -168,6 +168,7 @@ def split_list(a_list):
     return a_list[:half], a_list[half:]
 
 def fit_model_and_test_state_2(type):
+  global all_placearmies
   x_train, x_test, y_train, y_test = train_test_split(x_state_2, y_state_2, test_size=0.3,random_state=109)
   all_placearmies = list(set(y_train))
   for i in range(len(y_train)):
@@ -255,6 +256,7 @@ def fit_model_and_test_state_4(type):
   print("State 4 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 67.3%, RF: 96.2% much better than 1/4 (4 options in general)
 
 def fit_model_and_test_state_5(type):
+  global all_battle_won_moves
   x_train, x_test, y_train, y_test = train_test_split(x_state_5, y_state_5, test_size=0.3,random_state=109)
   all_battle_won_moves = list(set(y_train))
   for i in range(len(y_train)):
@@ -315,6 +317,7 @@ def fit_model_and_test_state_5(type):
 #   print("State 5 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # Gets 19%
 
 def fit_model_and_test_state_6(type):
+  global all_fortifying_moves
   x_train, x_test, y_train, y_test = train_test_split(x_state_6, y_state_6, test_size=0.3,random_state=109)
   all_fortifying_moves = list(set(y_train))
   for i in range(len(y_train)):
@@ -380,6 +383,22 @@ def fit_model_and_test_state_10(type):
     y_pred.append(ans)
   print("State 10 Accuracy:", metrics.accuracy_score(y_test, y_pred)) # NB: 100%, RF: 100% much better than 1/2 (2 options in general)
 
+def write_all_moves_to_file():
+  f = open("all_moves.txt", "w")
+  for val in all_placearmies:
+    f.write('placearmies ' + val + '\n')
+  for val in all_attacks:
+    f.write('attack ' + val + '\n')
+  for val in all_rolls_attacker:
+    f.write('attackroll ' + str(val) + '\n')
+  for val in all_battle_won_moves:
+    f.write('moveconquered ' + str(val) + '\n')
+  for val in all_fortifying_moves:
+    f.write('fortify ' + val + '\n')
+  for val in all_rolls_defender:
+    f.write('defendroll ' + str(val) + '\n')
+  f.close()
+
 if __name__ == "__main__":
   read_attacks()
   load_data()
@@ -389,3 +408,4 @@ if __name__ == "__main__":
   fit_model_and_test_state_5("forest")
   fit_model_and_test_state_6("forest")
   fit_model_and_test_state_10("forest")
+  write_all_moves_to_file()

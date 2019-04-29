@@ -48,12 +48,27 @@ class Coach():
             canonicalBoard = self.game.getCanonicalForm(board,self.curPlayer)
             temp = int(episodeStep < self.args.tempThreshold)
 
+            # print("board ", canonicalBoard)
             pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
             sym = self.game.getSymmetries(canonicalBoard, pi)
             for b,p in sym:
                 trainExamples.append([b, self.curPlayer, p, None])
 
-            action = np.random.choice(len(pi), p=pi)
+            legals = self.game.getValidMoves(canonicalBoard, 1)
+            legal_indices = [i for i, x in enumerate(legals) if x == 1]
+            # print("legal ", legal_indices)
+            revised_pi = []
+            for i in range(len(legal_indices)):
+                revised_pi.append(pi[legal_indices[i]])
+            if sum(revised_pi) == 0:
+                action = np.random.randint(len(legal_indices))
+                action = legal_indices[action]
+            else:
+                norm = [float(i)/sum(revised_pi) for i in revised_pi]
+                action = np.random.choice(len(norm), p=norm)
+                action = legal_indices[action]
+
+            # print("Relevant callsite")
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
 
             r = self.game.getGameEnded(board, self.curPlayer)
