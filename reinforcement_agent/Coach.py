@@ -46,6 +46,7 @@ class Coach():
         while True:
             episodeStep += 1
             canonicalBoard = self.game.getCanonicalForm(board,self.curPlayer)
+            # print("board: ", canonicalBoard)
             temp = int(episodeStep < self.args.tempThreshold)
 
             # print("board ", canonicalBoard)
@@ -67,6 +68,7 @@ class Coach():
                 norm = [float(i)/sum(revised_pi) for i in revised_pi]
                 action = np.random.choice(len(norm), p=norm)
                 action = legal_indices[action]
+            # print("action: ", action)
 
             # print("Relevant callsite")
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
@@ -133,8 +135,8 @@ class Coach():
             nmcts = MCTS(self.game, self.nnet, self.args)
 
             print('PITTING AGAINST PREVIOUS VERSION')
-            arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
-                          lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game)
+            arena = Arena(lambda x: np.random.choice(self.game.getActionSize(), p=pmcts.getActionProb(x)),
+                          lambda x: np.random.choice(self.game.getActionSize(), p=nmcts.getActionProb(x)), self.game)
             pwins, nwins, draws = arena.playGames(self.args.arenaCompare)
 
             print('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))

@@ -1,4 +1,13 @@
 saves/*
 supervised_agent/*.txt
 supervised_agent/*.pkl
+reinforcement_agent/temp_100eps/
+reinforcement_agent/temp_100eps_3explore_controlled_new_model/
+reinforcement_agent/temp_100eps_controlled/
+reinforcement_agent/temp_100eps_controlled_new_model/
+reinforcement_agent/temp_1eps_controlled_new_model/
+reinforcement_agent/temp_20eps_controlled/
+reinforcement_agent/temp_50eps_1.25explore_controlled_new_model/
+reinforcement_agent/temp_50eps_3explore_controlled_new_model/
+reinforcement_agent/temp_50eps_controlled_new_model/
 reinforcement_agent/*.txt

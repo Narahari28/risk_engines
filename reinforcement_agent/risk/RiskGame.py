@@ -19,7 +19,7 @@ class RiskGame(Game):
         return np.array(b.pieces)
 
     def getBoardSize(self):
-        return (1, 48)
+        return (1, 49)
 
     def getActionSize(self):
         all_moves = []
@@ -54,7 +54,7 @@ class RiskGame(Game):
     def getGameEnded(self, board, player):
         all_positive = True
         all_negative = True
-        if sum(abs(x) for x in board[0:42]) > 150:
+        if board[48] > 250:
             cnt_positive = 0
             cnt_negative = 0
             for i in range(42):
@@ -86,7 +86,7 @@ class RiskGame(Game):
         ans = [0]*len(board)
         for i in range(42):
             ans[i] = board[i]*player
-        for i in range(42, 48):
+        for i in range(42, 49):
             ans[i] = board[i]
         return np.array(ans)
 
@@ -104,4 +104,5 @@ def display(board):
     print("defender ind: " + str(board[43]))
     print("attacker roll: " + str(board[44]))
     print("defender roll: " + str(board[45]))
+    print("num turns: " + str(board[48]))
     print("countries ", board[0:42])

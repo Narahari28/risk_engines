@@ -14,9 +14,10 @@ Board data:
   pieces[45]: defender roll
   pieces[46]: number to place
   pieces[47]: game state
+  pieces[48]: turn
 '''
 class Board():
-    default_pieces = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 1, 2]
+    default_pieces = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 1, 2, 0]
 
     def __init__(self, allMoves, pieces=default_pieces, player=1):
         "Set up initial board configuration."
@@ -166,6 +167,7 @@ class Board():
         action = self.allMoves[action]
         # print("action ", action)
         gameState = self.pieces[47]
+        self.pieces[48] += 1
         if(gameState == 2):
             return self.executePlace(action.split()[1:])
         if(gameState == 3):

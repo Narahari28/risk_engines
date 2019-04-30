@@ -33,7 +33,6 @@ class MCTS():
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
-
         if temp==0:
             valids = self.game.getValidMoves(canonicalBoard, 1)
             valid_indices = [i for i, x in enumerate(valids) if x == 1]
@@ -49,7 +48,16 @@ class MCTS():
 
         counts = [x**(1./temp) for x in counts]
         probs = [x/float(sum(counts)) for x in counts]
-        return probs
+        valids = self.game.getValidMoves(canonicalBoard, 1)
+        valid_indices = [i for i, x in enumerate(valids) if x == 1]
+        ans = [0]*len(probs)
+        for i in range(len(valid_indices)):
+            index = valid_indices[i]
+            ans[index] = probs[index]
+        if sum(ans) == 0:
+            return [x/float(sum(valids)) for x in valids]
+        ans = [x/float(sum(ans)) for x in ans]
+        return ans
 
 
     def search(self, canonicalBoard):
