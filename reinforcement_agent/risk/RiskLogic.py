@@ -70,6 +70,7 @@ class Board():
             self.pieces[45] = 0
             self.pieces[47] = 3
         else:
+            self.player *= -1
             self.pieces[44] = int(action[0])
             self.pieces[47] = 10
 
@@ -133,6 +134,7 @@ class Board():
             self.pieces[47] = 3
 
     def executeDefendRoll(self, action):
+        self.player *= -1
         self.pieces[45] = int(action[0])
         attackerRoll = self.pieces[44]
         defenderRoll = self.pieces[45]

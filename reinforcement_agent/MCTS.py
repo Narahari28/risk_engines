@@ -29,7 +29,7 @@ class MCTS():
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
-            self.search(canonicalBoard)
+            self.search(canonicalBoard, 1, 1)
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
@@ -59,103 +59,186 @@ class MCTS():
         ans = [x/float(sum(ans)) for x in ans]
         return ans
 
-
-    def search(self, canonicalBoard):
+    def search(self, canonicalBoard, prevPlayer, curPlayer):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
         has the maximum upper confidence bound as in the paper.
-
         Once a leaf node is found, the neural network is called to return an
         initial policy P and a value v for the state. This value is propogated
         up the search path. In case the leaf node is a terminal state, the
         outcome is propogated up the search path. The values of Ns, Nsa, Qsa are
         updated.
-
         NOTE: the return values are the negative of the value of the current
         state. This is done since v is in [-1,1] and if v is the value of a
         state for the current player, then its value is -v for the other player.
-
         Returns:
             v: the negative of the value of the current canonicalBoard
         """
 
-        arg_stack = [canonicalBoard]
-        ans_stack = []
-        rev_arg_stack = []
-        best_action_stack = []
+        s = self.game.stringRepresentation(canonicalBoard)
 
-        while(len(arg_stack) > 0):
-            canonicalBoard = arg_stack.pop()
-            s = self.game.stringRepresentation(canonicalBoard)
-            if s not in self.Es:
-                self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
-            if self.Es[s]!=0:
-                # terminal node
-                ans_stack.append(-self.Es[s])
-                rev_arg_stack.append(s)
-                continue
+        if s not in self.Es:
+            self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
+        if self.Es[s]!=0:
+            # terminal node
+            return -self.Es[s] if prevPlayer != curPlayer else self.Es[s]
 
-            if s not in self.Ps:
-                # leaf node
-                self.Ps[s], v = self.nnet.predict(canonicalBoard)
-                valids = self.game.getValidMoves(canonicalBoard, 1)
-                self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
-                sum_Ps_s = np.sum(self.Ps[s])
-                if sum_Ps_s > 0:
-                    self.Ps[s] /= sum_Ps_s    # renormalize
-                else:
-                    # if all valid moves were masked make all valid moves equally probable
-                    
-                    # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
-                    # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.   
-                    print("All valid moves were masked, do workaround.")
-                    self.Ps[s] = self.Ps[s] + valids
-                    self.Ps[s] /= np.sum(self.Ps[s])
+        if s not in self.Ps:
+            # leaf node
+            self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            valids = self.game.getValidMoves(canonicalBoard, 1)
+            self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
+            sum_Ps_s = np.sum(self.Ps[s])
+            if sum_Ps_s > 0:
+                self.Ps[s] /= sum_Ps_s    # renormalize
+            else:
+                # if all valid moves were masked make all valid moves equally probable
+                
+                # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
+                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.   
+                print("All valid moves were masked, do workaround.")
+                self.Ps[s] = self.Ps[s] + valids
+                self.Ps[s] /= np.sum(self.Ps[s])
 
-                self.Vs[s] = valids
-                self.Ns[s] = 0
-                ans_stack.append(-v)
-                rev_arg_stack.append(s)
-                continue
+            self.Vs[s] = valids
+            self.Ns[s] = 0
+            return -v if prevPlayer != curPlayer else v
 
-            valids = self.Vs[s]
-            cur_best = -float('inf')
-            best_act = -1
+        valids = self.Vs[s]
+        cur_best = -float('inf')
+        best_act = -1
 
-            # pick the action with the highest upper confidence bound
-            for a in range(self.game.getActionSize()):
-                if valids[a]:
-                    if (s,a) in self.Qsa:
-                        u = self.Qsa[(s,a)] + self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s])/(1+self.Nsa[(s,a)])
-                    else:
-                        u = self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s] + EPS)     # Q = 0 ?
-
-                    if u > cur_best:
-                        cur_best = u
-                        best_act = a
-
-            a = best_act
-            best_action_stack.append(a)
-            rev_arg_stack.append(s)
-            next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
-            next_s = self.game.getCanonicalForm(next_s, next_player)
-
-            arg_stack.append(next_s)
-
-        cur_val = ans_stack[0]
-        for i in reversed(range(len(rev_arg_stack))):
-            s = rev_arg_stack[i]
-            if(i != len(rev_arg_stack) - 1):
-                a = best_action_stack[i - 1]
+        # pick the action with the highest upper confidence bound
+        for a in range(self.game.getActionSize()):
+            if valids[a]:
                 if (s,a) in self.Qsa:
-                    self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + cur_val)/(self.Nsa[(s,a)]+1)
-                    self.Nsa[(s,a)] += 1
-
+                    u = self.Qsa[(s,a)] + self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s])/(1+self.Nsa[(s,a)])
                 else:
-                    self.Qsa[(s,a)] = cur_val
-                    self.Nsa[(s,a)] = 1
+                    u = self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s] + EPS)     # Q = 0 ?
 
-                self.Ns[s] += 1
-                cur_val *= -1
-        return cur_val
+                if u > cur_best:
+                    cur_best = u
+                    best_act = a
+
+        a = best_act
+        next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
+        if(next_player == 1):
+            next_player = curPlayer
+        else:
+            next_player = curPlayer * -1
+        next_s = self.game.getCanonicalForm(next_s, next_player)
+
+        v = self.search(next_s, curPlayer, next_player)
+
+        if (s,a) in self.Qsa:
+            self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + v)/(self.Nsa[(s,a)]+1)
+            self.Nsa[(s,a)] += 1
+
+        else:
+            self.Qsa[(s,a)] = v
+            self.Nsa[(s,a)] = 1
+
+        self.Ns[s] += 1
+        return -v if prevPlayer != curPlayer else v
+
+
+    # def search(self, canonicalBoard):
+    #     """
+    #     This function performs one iteration of MCTS. It is recursively called
+    #     till a leaf node is found. The action chosen at each node is one that
+    #     has the maximum upper confidence bound as in the paper.
+
+    #     Once a leaf node is found, the neural network is called to return an
+    #     initial policy P and a value v for the state. This value is propogated
+    #     up the search path. In case the leaf node is a terminal state, the
+    #     outcome is propogated up the search path. The values of Ns, Nsa, Qsa are
+    #     updated.
+
+    #     NOTE: the return values are the negative of the value of the current
+    #     state. This is done since v is in [-1,1] and if v is the value of a
+    #     state for the current player, then its value is -v for the other player.
+
+    #     Returns:
+    #         v: the negative of the value of the current canonicalBoard
+    #     """
+
+    #     arg_stack = [canonicalBoard]
+    #     ans_stack = []
+    #     rev_arg_stack = []
+    #     best_action_stack = []
+
+    #     while(len(arg_stack) > 0):
+    #         canonicalBoard = arg_stack.pop()
+    #         s = self.game.stringRepresentation(canonicalBoard)
+    #         if s not in self.Es:
+    #             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
+    #         if self.Es[s]!=0:
+    #             # terminal node
+    #             ans_stack.append(-self.Es[s])
+    #             rev_arg_stack.append(s)
+    #             continue
+
+    #         if s not in self.Ps:
+    #             # leaf node
+    #             self.Ps[s], v = self.nnet.predict(canonicalBoard)
+    #             valids = self.game.getValidMoves(canonicalBoard, 1)
+    #             self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
+    #             sum_Ps_s = np.sum(self.Ps[s])
+    #             if sum_Ps_s > 0:
+    #                 self.Ps[s] /= sum_Ps_s    # renormalize
+    #             else:
+    #                 # if all valid moves were masked make all valid moves equally probable
+                    
+    #                 # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
+    #                 # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.   
+    #                 print("All valid moves were masked, do workaround.")
+    #                 self.Ps[s] = self.Ps[s] + valids
+    #                 self.Ps[s] /= np.sum(self.Ps[s])
+
+    #             self.Vs[s] = valids
+    #             self.Ns[s] = 0
+    #             ans_stack.append(-v)
+    #             rev_arg_stack.append(s)
+    #             continue
+
+    #         valids = self.Vs[s]
+    #         cur_best = -float('inf')
+    #         best_act = -1
+
+    #         # pick the action with the highest upper confidence bound
+    #         for a in range(self.game.getActionSize()):
+    #             if valids[a]:
+    #                 if (s,a) in self.Qsa:
+    #                     u = self.Qsa[(s,a)] + self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s])/(1+self.Nsa[(s,a)])
+    #                 else:
+    #                     u = self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s] + EPS)     # Q = 0 ?
+
+    #                 if u > cur_best:
+    #                     cur_best = u
+    #                     best_act = a
+
+    #         a = best_act
+    #         best_action_stack.append(a)
+    #         rev_arg_stack.append(s)
+    #         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
+    #         next_s = self.game.getCanonicalForm(next_s, next_player)
+
+    #         arg_stack.append(next_s)
+
+    #     cur_val = ans_stack[0]
+    #     for i in reversed(range(len(rev_arg_stack))):
+    #         s = rev_arg_stack[i]
+    #         if(i != len(rev_arg_stack) - 1):
+    #             a = best_action_stack[i - 1]
+    #             if (s,a) in self.Qsa:
+    #                 self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + cur_val)/(self.Nsa[(s,a)]+1)
+    #                 self.Nsa[(s,a)] += 1
+
+    #             else:
+    #                 self.Qsa[(s,a)] = cur_val
+    #                 self.Nsa[(s,a)] = 1
+
+    #             self.Ns[s] += 1
+    #             cur_val *= -1
+    #     return cur_val

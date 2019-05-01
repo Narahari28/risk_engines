@@ -10,4 +10,5 @@ reinforcement_agent/temp_20eps_controlled/
 reinforcement_agent/temp_50eps_1.25explore_controlled_new_model/
 reinforcement_agent/temp_50eps_3explore_controlled_new_model/
 reinforcement_agent/temp_50eps_controlled_new_model/
+reinforcement_agent/temp*/
 reinforcement_agent/*.txt
