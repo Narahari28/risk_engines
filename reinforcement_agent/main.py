@@ -8,15 +8,15 @@ import numpy as np
 
 args = dotdict({
     'numIters': 50,
-    'numEps': 50,
+    'numEps': 20,
     'tempThreshold': 250,
-    'updateThreshold': 0.55,
+    'updateThreshold': 0.52,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 6400,
     'arenaCompare': 25,
     'cpuct': 10,
 
-    'checkpoint': './temp_50eps_6400MCTS',
+    'checkpoint': './temp_20eps_6400MCTS',
     'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
@@ -25,15 +25,15 @@ args = dotdict({
 
 evalArgs = dotdict({
     'numIters': 50,
-    'numEps': 50,
+    'numEps': 20,
     'tempThreshold': 250,
-    'updateThreshold': 0.55,
+    'updateThreshold': 0.52,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 6400,
     'arenaCompare': 25,
     'cpuct': 10,
 
-    'checkpoint': './temp_50eps_6400MCTS',
+    'checkpoint': './temp_20eps_6400MCTS',
     'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
