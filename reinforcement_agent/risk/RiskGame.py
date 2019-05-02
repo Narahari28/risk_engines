@@ -54,7 +54,7 @@ class RiskGame(Game):
     def getGameEnded(self, board, player):
         all_positive = True
         all_negative = True
-        if board[48] > 125:
+        if board[48] > 75:
             cnt_positive = 0
             cnt_negative = 0
             for i in range(42):
