@@ -78,11 +78,11 @@ class Coach():
 
             if r!=0:
                 ans = [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
-                for val in trainExamples:
-                    print("board ", val[0])
-                    print("player ", val[1])
-                    print("pi ", val[2])
-                    print("v ", r*((-1)**(x[1]!=self.curPlayer)))
+                # for val in trainExamples:
+                #     print("board ", val[0])
+                #     print("player ", val[1])
+                #     print("pi ", val[2])
+                #     print("v ", r*((-1)**(x[1]!=self.curPlayer)))
                 return ans
 
     def learn(self):

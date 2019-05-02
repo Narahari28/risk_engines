@@ -8,7 +8,7 @@ import numpy as np
 
 args = dotdict({
     'numIters': 50,
-    'numEps': 1,
+    'numEps': 2,
     'tempThreshold': 250,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
@@ -16,7 +16,7 @@ args = dotdict({
     'arenaCompare': 30,
     'cpuct': 10,
 
-    'checkpoint': './temp_1eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
+    'checkpoint': './temp_2eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
     'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
@@ -25,7 +25,7 @@ args = dotdict({
 
 evalArgs = dotdict({
     'numIters': 50,
-    'numEps': 1,
+    'numEps': 2,
     'tempThreshold': 250,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
@@ -33,7 +33,7 @@ evalArgs = dotdict({
     'arenaCompare': 30,
     'cpuct': 10,
 
-    'checkpoint': './temp_1eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
+    'checkpoint': './temp_2eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
     'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
