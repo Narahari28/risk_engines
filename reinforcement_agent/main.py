@@ -13,7 +13,7 @@ args = dotdict({
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 6400,
-    'arenaCompare': 30,
+    'arenaCompare': 25,
     'cpuct': 10,
 
     'checkpoint': './temp_2eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
@@ -30,7 +30,7 @@ evalArgs = dotdict({
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 6400,
-    'arenaCompare': 30,
+    'arenaCompare': 25,
     'cpuct': 10,
 
     'checkpoint': './temp_2eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
