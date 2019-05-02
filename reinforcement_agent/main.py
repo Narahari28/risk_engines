@@ -12,11 +12,28 @@ args = dotdict({
     'tempThreshold': 250,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 20,
+    'numMCTSSims': 75,
     'arenaCompare': 30,
-    'cpuct': 4,
+    'cpuct': 10,
 
-    'checkpoint': './temp_50eps_shorter_4explore_controlled_new_model_oldsearch',
+    'checkpoint': './temp_1eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
+    'load_model': False,
+    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
+    'numItersForTrainExamplesHistory': 20,
+
+})
+
+evalArgs = dotdict({
+    'numIters': 50,
+    'numEps': 1,
+    'tempThreshold': 250,
+    'updateThreshold': 0.55,
+    'maxlenOfQueue': 200000,
+    'numMCTSSims': 75,
+    'arenaCompare': 30,
+    'cpuct': 10,
+
+    'checkpoint': './temp_1eps_0.001lr_75sims_shorter_4explore_controlled_new_model_fixedMCTS',
     'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
@@ -30,7 +47,7 @@ if __name__=="__main__":
     if args.load_model:
         nnet.load_checkpoint(args.load_folder_file[0], args.load_folder_file[1])
 
-    c = Coach(g, nnet, args)
+    c = Coach(g, nnet, args, evalArgs)
     if args.load_model:
         print("Load trainExamples from file")
         c.loadTrainExamples()

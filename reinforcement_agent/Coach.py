@@ -13,11 +13,12 @@ class Coach():
     This class executes the self-play + learning. It uses the functions defined
     in Game and NeuralNet. args are specified in main.py.
     """
-    def __init__(self, game, nnet, args):
+    def __init__(self, game, nnet, args, evalArgs):
         self.game = game
         self.nnet = nnet
         self.pnet = self.nnet.__class__(self.game)  # the competitor network
         self.args = args
+        self.evalArgs = evalArgs
         self.mcts = MCTS(self.game, self.nnet, self.args)
         self.trainExamplesHistory = []    # history of examples from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False # can be overriden in loadTrainExamples()
@@ -76,7 +77,13 @@ class Coach():
             r = self.game.getGameEnded(board, self.curPlayer)
 
             if r!=0:
-                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
+                ans = [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
+                for val in trainExamples:
+                    print("board ", val[0])
+                    print("player ", val[1])
+                    print("pi ", val[2])
+                    print("v ", r*((-1)**(x[1]!=self.curPlayer)))
+                return ans
 
     def learn(self):
         """
@@ -129,10 +136,10 @@ class Coach():
             # training new network, keeping a copy of the old one
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            pmcts = MCTS(self.game, self.pnet, self.args)
+            pmcts = MCTS(self.game, self.pnet, self.evalArgs)
             
             self.nnet.train(trainExamples)
-            nmcts = MCTS(self.game, self.nnet, self.args)
+            nmcts = MCTS(self.game, self.nnet, self.evalArgs)
 
             print('PITTING AGAINST PREVIOUS VERSION')
             arena = Arena(lambda x: np.random.choice(self.game.getActionSize(), p=pmcts.getActionProb(x)),

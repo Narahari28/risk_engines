@@ -103,7 +103,8 @@ class MCTS():
 
             self.Vs[s] = valids
             self.Ns[s] = 0
-            return -v if prevPlayer != curPlayer else v
+
+            return -v[0] if prevPlayer != curPlayer else v[0]
 
         valids = self.Vs[s]
         cur_best = -float('inf')
@@ -116,19 +117,18 @@ class MCTS():
                     u = self.Qsa[(s,a)] + self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s])/(1+self.Nsa[(s,a)])
                 else:
                     u = self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s] + EPS)     # Q = 0 ?
-
                 if u > cur_best:
                     cur_best = u
                     best_act = a
 
         a = best_act
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
+        next_s = self.game.getCanonicalForm(next_s, next_player)
+
         if(next_player == 1):
             next_player = curPlayer
         else:
             next_player = curPlayer * -1
-        next_s = self.game.getCanonicalForm(next_s, next_player)
-
         v = self.search(next_s, curPlayer, next_player)
 
         if (s,a) in self.Qsa:
